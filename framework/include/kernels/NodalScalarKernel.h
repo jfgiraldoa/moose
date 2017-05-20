@@ -16,8 +16,8 @@
 #define NODALSCALARKERNEL_H
 
 #include "ScalarKernel.h"
-#include "Coupleable.h"
-#include "MooseVariableDependencyInterface.h"
+//#include "Coupleable.h"
+//#include "MooseVariableDependencyInterface.h"
 
 class NodalScalarKernel;
 
@@ -27,9 +27,9 @@ InputParameters validParams<NodalScalarKernel>();
 /**
  *
  */
-class NodalScalarKernel : public ScalarKernel,
-                          public Coupleable,
-                          public MooseVariableDependencyInterface
+class NodalScalarKernel : public ScalarKernel
+                          //public Coupleable,
+                          //public MooseVariableDependencyInterface
 {
 public:
   NodalScalarKernel(const InputParameters & parameters);

@@ -16,7 +16,8 @@
 #define SCALARKERNEL_H
 
 #include "MooseObject.h"
-#include "ScalarCoupleable.h"
+//#include "ScalarCoupleable.h"
+#include "CoupleableMooseScalarVariableDependencyIntermediateInterface.h"
 #include "SetupInterface.h"
 #include "FunctionInterface.h"
 #include "UserObjectInterface.h"
@@ -39,7 +40,8 @@ template <>
 InputParameters validParams<ScalarKernel>();
 
 class ScalarKernel : public MooseObject,
-                     public ScalarCoupleable,
+                     //public ScalarCoupleable,
+                     public CoupleableMooseScalarVariableDependencyIntermediateInterface,
                      public SetupInterface,
                      public FunctionInterface,
                      public UserObjectInterface,

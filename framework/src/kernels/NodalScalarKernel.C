@@ -30,8 +30,8 @@ validParams<NodalScalarKernel>()
 
 NodalScalarKernel::NodalScalarKernel(const InputParameters & parameters)
   : ScalarKernel(parameters),
-    Coupleable(this, true),
-    MooseVariableDependencyInterface(),
+    //Coupleable(this, true),
+    //MooseVariableDependencyInterface(),
     _node_ids(getParam<std::vector<dof_id_type>>("nodes"))
 {
   // Fill in the MooseVariable dependencies
