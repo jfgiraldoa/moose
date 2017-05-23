@@ -19,6 +19,7 @@
 #include "KernelWarehouse.h"
 #include "ConstraintWarehouse.h"
 #include "MooseObjectWarehouse.h"
+#include "ScalarKernelWarehouse.h"
 
 // libMesh includes
 #include "libmesh/transient_system.h"
@@ -484,6 +485,7 @@ public:
    * Access functions to Warehouses from outside NonlinearSystemBase
    */
   const KernelWarehouse & getKernelWarehouse() { return _kernels; }
+  const ScalarKernelWarehouse & getScalarKernelWarehouse() { return _scalar_kernels; }
   const MooseObjectWarehouse<KernelBase> & getTimeKernelWarehouse() { return _time_kernels; }
   const MooseObjectWarehouse<KernelBase> & getNonTimeKernelWarehouse() { return _non_time_kernels; }
   const MooseObjectWarehouse<KernelBase> & getEigenKernelWarehouse() { return _eigen_kernels; }
@@ -593,7 +595,8 @@ protected:
   ///@{
   /// Kernel Storage
   KernelWarehouse _kernels;
-  MooseObjectWarehouse<ScalarKernel> _scalar_kernels;
+  ScalarKernelWarehouse _scalar_kernels;
+  //MooseObjectWarehouse<ScalarKernel> _scalar_kernels;
   MooseObjectWarehouse<ScalarKernel> _time_scalar_kernels;
   MooseObjectWarehouse<ScalarKernel> _non_time_scalar_kernels;
   MooseObjectWarehouse<DGKernel> _dg_kernels;

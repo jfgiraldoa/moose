@@ -27,6 +27,7 @@ class IntegratedBC;
 class DGKernel;
 class InterfaceKernel;
 class KernelWarehouse;
+class ScalarKernelWarehouse;
 
 class ComputeJacobianThread : public ThreadedElementLoop<ConstElemRange>
 {
@@ -69,6 +70,9 @@ protected:
   const KernelWarehouse & _kernels;
 
   Moose::KernelType _kernel_type;
+
+  // Reference to ScalarKernel storage structure
+  const ScalarKernelWarehouse & _scalar_kernels;
 
   virtual void computeJacobian();
   virtual void computeFaceJacobian(BoundaryID bnd_id);

@@ -33,7 +33,8 @@ ComputeFullJacobianThread::ComputeFullJacobianThread(FEProblemBase & fe_problem,
     _integrated_bcs(_nl.getIntegratedBCWarehouse()),
     _dg_kernels(_nl.getDGKernelWarehouse()),
     _interface_kernels(_nl.getInterfaceKernelWarehouse()),
-    _kernels(_nl.getKernelWarehouse())
+    _kernels(_nl.getKernelWarehouse()),
+    _scalar_kernels(_nl.getScalarKernelWarehouse())
 {
 }
 
@@ -45,7 +46,8 @@ ComputeFullJacobianThread::ComputeFullJacobianThread(ComputeFullJacobianThread &
     _integrated_bcs(x._integrated_bcs),
     _dg_kernels(x._dg_kernels),
     _interface_kernels(x._interface_kernels),
-    _kernels(x._kernels)
+    _kernels(x._kernels),
+    _scalar_kernels(x._scalar_kernels)
 {
 }
 

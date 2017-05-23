@@ -52,6 +52,10 @@ protected:
 
   // Reference to Kernel storage
   const KernelWarehouse & _kernels;
+
+  // Reference to ScalarKernel storage
+  const ScalarKernelWarehouse & _scalar_kernels;
+
 };
 
 #endif // COMPUTEFULLJACOBIANTHREAD_H
