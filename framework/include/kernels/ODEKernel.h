@@ -40,6 +40,13 @@ protected:
   virtual Real computeQpResidual() = 0;
   virtual Real computeQpJacobian();
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
+  //virtual void precalculateOffDiagJacobian(unsigned int jvar);
+  Assembly & _assembly;
+  unsigned int _qp;
+  QBase *& _qrule;
+  const MooseArray<Real> & _JxW;
+  const MooseArray<Real> & _coord;
+  const VariablePhiValue & _phi;
 };
 
 #endif /* ODEKERNEL_H */

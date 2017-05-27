@@ -16,8 +16,12 @@
 
 // MOOSE includes
 #include "Assembly.h"
+#include "MooseVariable.h"
 #include "MooseVariableScalar.h"
 #include "SystemBase.h"
+
+// libmesh includes
+#include "libmesh/quadrature.h"
 
 template <>
 InputParameters
@@ -27,7 +31,14 @@ validParams<ODEKernel>()
   return params;
 }
 
-ODEKernel::ODEKernel(const InputParameters & parameters) : ScalarKernel(parameters) {}
+ODEKernel::ODEKernel(const InputParameters & parameters)
+  : ScalarKernel(parameters),
+    _assembly(_subproblem.assembly(_tid)),
+    _qrule(_assembly.qRule()),
+    _JxW(_assembly.JxW()),
+    _coord(_assembly.coordTransformation()),
+    _phi(_assembly.phi())
+{}
 
 void
 ODEKernel::reinit()
@@ -55,6 +66,11 @@ ODEKernel::computeJacobian()
   const std::vector<MooseVariableScalar *> & scalar_vars = _sys.getScalarVariables(_tid);
   for (const auto & var : scalar_vars)
     computeOffDiagJacobian(var->number());
+
+  // compute off-diagonal jacobians wrt non-scalar variables
+  const std::vector<MooseVariable *> & vars = _sys.getVariables(_tid);
+  for (const auto & var : vars)
+      computeOffDiagJacobian(var->number());
 }
 
 void
@@ -70,6 +86,15 @@ ODEKernel::computeOffDiagJacobian(unsigned int jvar)
         if (jvar != _var.number())
           ke(_i, _j) += computeQpOffDiagJacobian(jvar);
       }
+  }
+  else
+  {
+    DenseMatrix<Number> & ke = _assembly.jacobianBlock(_var.number(), jvar);
+    //precalculateOffDiagJacobian(jvar); // TODO: needed?
+    for (_i = 0; _i < _var.order(); _i++)
+      for (_j = 0; _j < _phi.size(); _j++)
+        for (_qp = 0; _qp < _qrule->n_points(); _qp++)
+          ke(_i, _j) += _JxW[_qp] * _coord[_qp] * computeQpOffDiagJacobian(jvar);
   }
 }
 
