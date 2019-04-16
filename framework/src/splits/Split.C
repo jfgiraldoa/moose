@@ -112,8 +112,8 @@ Split::setup(const std::string & prefix)
     po.values.push_back(Moose::stringify(_vars));
 
     for (const auto & var : _vars)
-      if (!_fe_problem.hasVariable(var))
-        mooseError("Variable '", var, "' specified in split '", name(), "' does not exist");
+      if (!_fe_problem.hasVariable(var) && !_fe_problem.hasScalarVariable(var))
+        mooseError("Variable/ScalarVariable '", var, "' specified in split '", name(), "' does not exist");
   }
 
   // block options

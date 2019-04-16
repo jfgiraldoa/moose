@@ -69,6 +69,7 @@
 #include "GeneralUserObject.h"
 #include "ThreadedGeneralUserObject.h"
 #include "InternalSideIndicator.h"
+#include "ExternalSideIndicator.h"
 #include "Transfer.h"
 #include "MultiAppTransfer.h"
 #include "MultiMooseEnum.h"
@@ -721,6 +722,7 @@ FEProblemBase::initialSetup()
   for (THREAD_ID tid = 0; tid < n_threads; tid++)
   {
     _internal_side_indicators.initialSetup(tid);
+    _external_side_indicators.initialSetup(tid);
     _indicators.initialSetup(tid);
     _markers.sort(tid);
     _markers.initialSetup(tid);
@@ -910,6 +912,7 @@ FEProblemBase::timestepSetup()
   for (THREAD_ID tid = 0; tid < n_threads; tid++)
   {
     _internal_side_indicators.timestepSetup(tid);
+    _external_side_indicators.timestepSetup(tid);
     _indicators.timestepSetup(tid);
     _markers.timestepSetup(tid);
   }
@@ -2946,7 +2949,8 @@ void
 FEProblemBase::computeIndicators()
 {
   // Initialize indicator aux variable fields
-  if (_indicators.hasActiveObjects() || _internal_side_indicators.hasActiveObjects())
+  if (_indicators.hasActiveObjects() || _internal_side_indicators.hasActiveObjects()
+      || _external_side_indicators.hasActiveObjects())
   {
     TIME_SECTION(_compute_indicators_timer);
 
@@ -2961,6 +2965,11 @@ FEProblemBase::computeIndicators()
     const auto & internal_indicators = _internal_side_indicators.getActiveObjects();
     for (const auto & internal_indicator : internal_indicators)
       fields.push_back(internal_indicator->name());
+
+    // ExternalSideIndicator Fields
+    const auto & external_indicators = _external_side_indicators.getActiveObjects();
+    for (const auto & external_indicator : external_indicators)
+      fields.push_back(external_indicator->name());
 
     _aux->zeroVariables(fields);
 
@@ -3300,6 +3309,7 @@ FEProblemBase::updateActiveObjects()
     _aux->updateActive(tid);
     _indicators.updateActive(tid);
     _internal_side_indicators.updateActive(tid);
+    _external_side_indicators.updateActive(tid);
     _markers.updateActive(tid);
     _all_materials.updateActive(tid);
     _residual_materials.updateActive(tid);
@@ -3397,8 +3407,12 @@ FEProblemBase::addIndicator(std::string indicator_name,
 
     std::shared_ptr<InternalSideIndicator> isi =
         std::dynamic_pointer_cast<InternalSideIndicator>(indicator);
+    std::shared_ptr<ExternalSideIndicator> ise =
+        std::dynamic_pointer_cast<ExternalSideIndicator>(indicator);
     if (isi)
       _internal_side_indicators.addObject(isi, tid);
+    else if (ise)
+      _external_side_indicators.addObject(ise, tid);
     else
       _indicators.addObject(indicator, tid);
   }

@@ -17,6 +17,7 @@
 // Forward declarations
 class AuxiliarySystem;
 class InternalSideIndicators;
+class ExternalSideIndicators;
 
 class ComputeIndicatorThread : public ThreadedElementLoop<ConstElemRange>
 {
@@ -52,6 +53,9 @@ protected:
 
   /// InternalSideIndicator Storage
   const MooseObjectWarehouse<InternalSideIndicator> & _internal_side_indicators;
+
+  /// ExternalSideIndicator Storage
+  const MooseObjectWarehouse<ExternalSideIndicator> & _external_side_indicators;
 
   bool _finalize;
 };

@@ -14,6 +14,7 @@
 #include "FEProblem.h"
 #include "Indicator.h"
 #include "InternalSideIndicator.h"
+#include "ExternalSideIndicator.h"
 #include "MooseVariableFE.h"
 #include "Problem.h"
 #include "SwapBackSentinel.h"
@@ -26,6 +27,7 @@ ComputeIndicatorThread::ComputeIndicatorThread(FEProblemBase & fe_problem, bool 
     _aux_sys(fe_problem.getAuxiliarySystem()),
     _indicator_whs(_fe_problem.getIndicatorWarehouse()),
     _internal_side_indicators(_fe_problem.getInternalSideIndicatorWarehouse()),
+    _external_side_indicators(_fe_problem.getExternalSideIndicatorWarehouse()),
     _finalize(finalize)
 {
 }
@@ -37,6 +39,7 @@ ComputeIndicatorThread::ComputeIndicatorThread(ComputeIndicatorThread & x, Threa
     _aux_sys(x._aux_sys),
     _indicator_whs(x._indicator_whs),
     _internal_side_indicators(x._internal_side_indicators),
+    _external_side_indicators(x._external_side_indicators),
     _finalize(x._finalize)
 {
 }
@@ -50,15 +53,18 @@ ComputeIndicatorThread::subdomainChanged()
 
   _indicator_whs.subdomainSetup(_tid);
   _internal_side_indicators.subdomainSetup(_tid);
+  _external_side_indicators.subdomainSetup(_tid);
 
   std::set<MooseVariableFEBase *> needed_moose_vars;
   _indicator_whs.updateVariableDependency(needed_moose_vars, _tid);
   _internal_side_indicators.updateVariableDependency(needed_moose_vars, _tid);
+  _external_side_indicators.updateVariableDependency(needed_moose_vars, _tid);
   _fe_problem.setActiveElementalMooseVariables(needed_moose_vars, _tid);
 
   std::set<unsigned int> needed_mat_props;
   _indicator_whs.updateMatPropDependency(needed_mat_props, _tid);
   _internal_side_indicators.updateMatPropDependency(needed_mat_props, _tid);
+  _external_side_indicators.updateMatPropDependency(needed_mat_props, _tid);
   _fe_problem.setActiveMaterialProperties(needed_mat_props, _tid);
 
   _fe_problem.prepareMaterials(_subdomain, _tid);
@@ -112,6 +118,14 @@ ComputeIndicatorThread::onElement(const Elem * elem)
       for (const auto & internal_indicator : internal_indicators)
         internal_indicator->finalize();
     }
+
+    if (_external_side_indicators.hasActiveBlockObjects(_subdomain, _tid))
+    {
+      const std::vector<std::shared_ptr<ExternalSideIndicator>> & external_indicators =
+          _external_side_indicators.getActiveBlockObjects(_subdomain, _tid);
+      for (const auto & external_indicator : external_indicators)
+        external_indicator->finalize();
+    }
   }
 
   if (!_finalize) // During finalize the Indicators should be setting values in the vectors manually
@@ -126,10 +140,32 @@ ComputeIndicatorThread::onElement(const Elem * elem)
 }
 
 void
-ComputeIndicatorThread::onBoundary(const Elem * /*elem*/,
+ComputeIndicatorThread::onBoundary(const Elem * elem,
                                    unsigned int /*side*/,
                                    BoundaryID /*bnd_id*/)
 {
+  if (_finalize) // If finalizing we only do something on the elements
+    return;
+
+  for (const auto & it : _aux_sys._elem_vars[_tid])
+  {
+    MooseVariable * var = it.second;
+    var->prepareAux();
+  }
+
+  SubdomainID block_id = elem->subdomain_id();
+  if (_external_side_indicators.hasActiveBlockObjects(block_id, _tid))
+  {
+    // Set up Sentinels so that, even if one of the reinitMaterialsXXX() calls throws, we
+    // still remember to swap back during stack unwinding.
+    SwapBackSentinel face_sentinel(_fe_problem, &FEProblemBase::swapBackMaterialsFace, _tid);
+    _fe_problem.reinitMaterialsFace(block_id, _tid);
+
+    const std::vector<std::shared_ptr<ExternalSideIndicator>> & indicators =
+        _external_side_indicators.getActiveBlockObjects(block_id, _tid);
+    for (const auto & indicator : indicators)
+      indicator->computeIndicator();
+  }
 }
 
 void
