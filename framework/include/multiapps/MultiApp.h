@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MULTIAPP_H
-#define MULTIAPP_H
+#pragma once
 
 #include "MooseObject.h"
 #include "SetupInterface.h"
@@ -308,6 +307,13 @@ protected:
   /// call back executed right before app->runInputFile()
   virtual void preRunInputFile();
 
+  /** Method to aid in getting the "cli_args" parameters.
+   *
+   * The method is virtual because it is needed to allow for batch runs within the stochastic tools
+   * module, see SamplerFullSolveMultiApp for an example.
+   */
+  virtual std::string getCommandLineArgsParamHelper(unsigned int local_app);
+
   /**
    * Initialize the MultiApp by creating the provided number of apps.
    *
@@ -447,5 +453,3 @@ dataLoad(std::istream & stream, SubAppBackups & backups, void * context)
 
   multi_app->restore();
 }
-
-#endif // MULTIAPP_H

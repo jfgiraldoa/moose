@@ -1,11 +1,13 @@
-/****************************************************************/
-/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
-/*                                                              */
-/*          All contents are licensed under LGPL V2.1           */
-/*             See LICENSE for full restrictions                */
-/****************************************************************/
-#ifndef COMPUTEELASTICITYBEAM_H
-#define COMPUTEELASTICITYBEAM_H
+//* This file is part of the MOOSE framework
+//* https://www.mooseframework.org
+//*
+//* All rights reserved, see COPYRIGHT for full restrictions
+//* https://github.com/idaholab/moose/blob/master/COPYRIGHT
+//*
+//* Licensed under LGPL 2.1, please see LICENSE for details
+//* https://www.gnu.org/licenses/lgpl-2.1.html
+
+#pragma once
 
 #include "Material.h"
 
@@ -34,7 +36,7 @@ protected:
   MaterialProperty<RealVectorValue> & _material_flexure;
 
   /// Prefactor function used to modify (i.e., multiply) the material stiffness and flexure vectors
-  Function * const _prefactor_function;
+  const Function * const _prefactor_function;
 
   /// Young's modulus of the beam material
   const VariableValue & _youngs_modulus;
@@ -45,5 +47,3 @@ protected:
   /// Shear coefficient for the beam cross-section
   const VariableValue & _shear_coefficient;
 };
-
-#endif // COMPUTEELASTICITYBEAM_H

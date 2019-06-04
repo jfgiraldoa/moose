@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PIECEWISEBASE_H
-#define PIECEWISEBASE_H
+#pragma once
 
 #include "Function.h"
 #include "LinearInterpolation.h"
@@ -30,9 +29,9 @@ public:
   PiecewiseBase(const InputParameters & parameters);
 
   virtual void initialSetup();
-  virtual Real functionSize();
-  virtual Real domain(const int i);
-  virtual Real range(const int i);
+  virtual Real functionSize() const;
+  virtual Real domain(const int i) const;
+  virtual Real range(const int i) const;
 
   /**
    * Provides a means for explicitly setting the x and y data. This must
@@ -46,5 +45,3 @@ protected:
   const bool _has_axis;
   bool _data_set;
 };
-
-#endif

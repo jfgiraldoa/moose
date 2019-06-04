@@ -66,6 +66,12 @@ ElementLoopUserObject::initialize()
 }
 
 void
+ElementLoopUserObject::preElement(const Elem * elem)
+{
+  _fe_problem.setCurrentSubdomainID(elem, _tid);
+}
+
+void
 ElementLoopUserObject::execute()
 {
   ConstElemRange & elem_range = *_mesh.getActiveLocalElementRange();
@@ -83,6 +89,7 @@ ElementLoopUserObject::execute()
 
       const Elem * elem = *el;
       unsigned int cur_subdomain = elem->subdomain_id();
+      preElement(elem);
 
       _old_subdomain = _subdomain;
       _subdomain = cur_subdomain;
@@ -104,9 +111,9 @@ ElementLoopUserObject::execute()
                  ++it)
               onBoundary(elem, side, *it);
 
-          if (elem->neighbor(side) != NULL)
+          if (elem->neighbor_ptr(side) != NULL)
           {
-            if (this->hasBlocks(elem->neighbor(side)->subdomain_id()))
+            if (this->hasBlocks(elem->neighbor_ptr(side)->subdomain_id()))
               onInternalSide(elem, side);
             if (boundary_ids.size() > 0)
               for (std::vector<BoundaryID>::iterator it = boundary_ids.begin();
@@ -161,7 +168,7 @@ ElementLoopUserObject::onInternalSide(const Elem * elem, unsigned int side)
 {
   _current_elem = elem;
   // Pointer to the neighbor we are currently working on.
-  _current_neighbor = elem->neighbor(side);
+  _current_neighbor = elem->neighbor_ptr(side);
 
   // Get the global id of the element and the neighbor
   const dof_id_type elem_id = elem->id();
@@ -189,7 +196,7 @@ ElementLoopUserObject::onInterface(const Elem * elem, unsigned int side, Boundar
 {
   _current_elem = elem;
   // Pointer to the neighbor we are currently working on.
-  _current_neighbor = elem->neighbor(side);
+  _current_neighbor = elem->neighbor_ptr(side);
 
   // Get the global id of the element and the neighbor
   const dof_id_type elem_id = elem->id();

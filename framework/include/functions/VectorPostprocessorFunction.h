@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef VectorPostprocessorFunction_H
-#define VectorPostprocessorFunction_H
+#pragma once
 
 #include "Function.h"
 #include "LinearInterpolation.h"
@@ -28,7 +27,7 @@ class VectorPostprocessorFunction : public Function, public VectorPostprocessorI
 {
 public:
   VectorPostprocessorFunction(const InputParameters & parameters);
-  virtual Real value(Real /*t*/, const Point & pt) override;
+  virtual Real value(Real /*t*/, const Point & pt) const override;
 
 protected:
   std::unique_ptr<LinearInterpolation> _linear_interp;
@@ -36,5 +35,3 @@ protected:
   const VectorPostprocessorValue & _argument_column;
   const VectorPostprocessorValue & _value_column;
 };
-
-#endif

@@ -9,6 +9,9 @@
 
 #include "libmesh/petsc_macro.h"
 #include "libmesh/libmesh_config.h"
+#include "libmesh/petsc_vector.h"
+#include "libmesh/petsc_matrix.h"
+#include <petscsnes.h>
 
 #include "Moose.h"
 #include "MooseApp.h"
@@ -42,6 +45,21 @@ const ExecFlagType EXEC_SUBDOMAIN("SUBDOMAIN", 0x200);          // 512
 const ExecFlagType EXEC_PRE_DISPLACE("PRE_DISPLACE");
 const ExecFlagType EXEC_SAME_AS_MULTIAPP("SAME_AS_MULTIAPP");
 const ExecFlagType EXEC_PRE_MULTIAPP_SETUP("PRE_MULTIAPP_SETUP");
+const ExecFlagType EXEC_TRANSFER("TRANSFER");
+
+void
+MooseVecView(NumericVector<Number> & vector)
+{
+  PetscVector<Number> & petsc_vec = static_cast<PetscVector<Number> &>(vector);
+  VecView(petsc_vec.vec(), 0);
+}
+
+void
+MooseMatView(SparseMatrix<Number> & mat)
+{
+  PetscMatrix<Number> & petsc_mat = static_cast<PetscMatrix<Number> &>(mat);
+  MatView(petsc_mat.mat(), 0);
+}
 
 namespace Moose
 {
@@ -116,6 +134,7 @@ addActionTypes(Syntax & syntax)
   registerMooseObjectTask("add_sampler",                  Sampler,                false);
 
   registerMooseObjectTask("add_aux_kernel",               AuxKernel,              false);
+  appendMooseObjectTask  ("add_aux_kernel",               VectorAuxKernel);
   registerMooseObjectTask("add_elemental_field_variable", AuxKernel,              false);
 
   registerMooseObjectTask("add_scalar_kernel",            ScalarKernel,           false);
@@ -123,6 +142,7 @@ addActionTypes(Syntax & syntax)
   registerMooseObjectTask("add_dirac_kernel",             DiracKernel,            false);
   registerMooseObjectTask("add_dg_kernel",                DGKernel,               false);
   registerMooseObjectTask("add_interface_kernel",         InterfaceKernel,        false);
+  appendMooseObjectTask  ("add_interface_kernel",         VectorInterfaceKernel);
   registerMooseObjectTask("add_constraint",               Constraint,             false);
 
   registerMooseObjectTask("add_ic",                       InitialCondition,       false);
@@ -205,6 +225,7 @@ addActionTypes(Syntax & syntax)
   registerTask("setup_variable_complete", false);
   registerTask("ready_to_init", true);
   appendMooseObjectTask("ready_to_init", InterfaceKernel);
+  appendMooseObjectTask("ready_to_init", VectorInterfaceKernel);
   appendMooseObjectTask("ready_to_init", DGKernel);
 
   // Output related actions
@@ -358,6 +379,7 @@ registerExecFlags(Factory & factory)
   registerExecFlag(EXEC_FORCED);
   registerExecFlag(EXEC_FAILED);
   registerExecFlag(EXEC_CUSTOM);
+  registerExecFlag(EXEC_TRANSFER);
   registerExecFlag(EXEC_SUBDOMAIN);
   registerExecFlag(EXEC_PRE_DISPLACE);
   registerExecFlag(EXEC_SAME_AS_MULTIAPP);
@@ -397,7 +419,6 @@ associateSyntaxInner(Syntax & syntax, ActionFactory & /*action_factory*/)
 
   registerSyntax("AddMeshModifierAction", "MeshModifiers/*");
   registerSyntax("AddMeshGeneratorAction", "MeshGenerators/*");
-  registerSyntax("AddMortarInterfaceAction", "Mesh/MortarInterfaces/*");
 
   registerSyntax("AddFunctionAction", "Functions/*");
   syntax.registerSyntaxType("Functions/*", "FunctionName");

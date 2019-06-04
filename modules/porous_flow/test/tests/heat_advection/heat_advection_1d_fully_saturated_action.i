@@ -104,8 +104,6 @@
   [./andy]
     type = SMP
     full = true
-    petsc_options_iname = '-ksp_type -pc_type -snes_atol -snes_rtol -snes_max_it'
-    petsc_options_value = 'gmres bjacobi 1E-15 1E-10 10000'
   [../]
 []
 
@@ -116,8 +114,22 @@
   end_time = 0.6
 []
 
+[VectorPostprocessors]
+  [./T]
+    type = LineValueSampler
+    start_point = '0 0 0'
+    end_point = '1 0 0'
+    num_points = 51
+    sort_by = x
+    variable = temp
+  [../]
+[]
+
 [Outputs]
-  file_base = heat_advection_1d_KT_out
-  exodus = true
-  interval = 10
+  file_base = heat_advection_1d_fully_saturation_action
+  [./csv]
+    type = CSV
+    sync_times = '0.1 0.6'
+    sync_only = true
+  [../]
 []

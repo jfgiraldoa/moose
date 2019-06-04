@@ -7,30 +7,32 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef LEVELSETADVECTIONSUPG_H
-#define LEVELSETADVECTIONSUPG_H
+#pragma once
 
 // MOOSE includes
-#include "Kernel.h"
+#include "ADKernelGrad.h"
 #include "LevelSetVelocityInterface.h"
 
 // Forward declarations
+template <ComputeStage>
 class LevelSetAdvectionSUPG;
 
-template <>
-InputParameters validParams<LevelSetAdvectionSUPG>();
+declareADValidParams(LevelSetAdvectionSUPG);
 
 /**
  * SUPG stabilization for the advection portion of the level set equation.
  */
-class LevelSetAdvectionSUPG : public LevelSetVelocityInterface<Kernel>
+template <ComputeStage compute_stage>
+class LevelSetAdvectionSUPG : public LevelSetVelocityInterface<ADKernelGrad<compute_stage>>
 {
 public:
   LevelSetAdvectionSUPG(const InputParameters & parameters);
 
 protected:
-  Real computeQpResidual() override;
-  Real computeQpJacobian() override;
+  virtual ADVectorResidual precomputeQpResidual() override;
+
+  usingKernelGradMembers;
+  using LevelSetVelocityInterface<ADKernelGrad<compute_stage>>::computeQpVelocity;
+  using LevelSetVelocityInterface<ADKernelGrad<compute_stage>>::_velocity;
 };
 
-#endif // LEVELSETADVECTIONSUPG_H

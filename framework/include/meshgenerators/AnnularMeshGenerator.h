@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ANNULARMESHGENERATOR_H
-#define ANNULARMESHGENERATOR_H
+#pragma once
 
 #include "MeshGenerator.h"
 
@@ -26,7 +25,7 @@ class AnnularMeshGenerator : public MeshGenerator
 public:
   AnnularMeshGenerator(const InputParameters & parameters);
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   /// Number of elements in radial direction
@@ -63,4 +62,3 @@ protected:
   const SubdomainID _tri_subdomain_id;
 };
 
-#endif // ANNULARMESHGENERATOR_H

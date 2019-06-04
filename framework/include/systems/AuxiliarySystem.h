@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef AUXILIARYSYSTEM_H
-#define AUXILIARYSYSTEM_H
+#pragma once
 
 // MOOSE includes
 #include "SystemBase.h"
@@ -19,11 +18,13 @@
 #include "libmesh/transient_system.h"
 
 // Forward declarations
-class AuxKernel;
+template <typename ComputeValueType>
+class AuxKernelTempl;
+typedef AuxKernelTempl<Real> AuxKernel;
+typedef AuxKernelTempl<RealVectorValue> VectorAuxKernel;
 class FEProblemBase;
 class TimeIntegrator;
 class AuxScalarKernel;
-class AuxKernel;
 
 // libMesh forward declarations
 namespace libMesh
@@ -97,15 +98,20 @@ public:
   virtual void
   reinitElemFace(const Elem * elem, unsigned int side, BoundaryID bnd_id, THREAD_ID tid) override;
 
-  virtual const NumericVector<Number> *& currentSolution() override
+  const NumericVector<Number> * const & currentSolution() const override
   {
     _current_solution = _sys.current_local_solution.get();
     return _current_solution;
   }
 
-  virtual NumericVector<Number> * solutionUDot() override { return _u_dot; }
-
-  virtual NumericVector<Number> * solutionUDotDot() override { return _u_dotdot; }
+  NumericVector<Number> * solutionUDot() override { return _u_dot; }
+  NumericVector<Number> * solutionUDotDot() override { return _u_dotdot; }
+  NumericVector<Number> * solutionUDotOld() override { return _u_dot_old; }
+  NumericVector<Number> * solutionUDotDotOld() override { return _u_dotdot_old; }
+  const NumericVector<Number> * solutionUDot() const override { return _u_dot; }
+  const NumericVector<Number> * solutionUDotDot() const override { return _u_dotdot; }
+  const NumericVector<Number> * solutionUDotOld() const override { return _u_dot_old; }
+  const NumericVector<Number> * solutionUDotDotOld() const override { return _u_dotdot_old; }
 
   virtual void serializeSolution();
   virtual NumericVector<Number> & serializedSolution() override;
@@ -153,23 +159,26 @@ public:
    */
   bool needMaterialOnSide(BoundaryID bnd_id);
 
-  virtual NumericVector<Number> & solution() override { return *_sys.solution; }
+  NumericVector<Number> & solution() override { return *_sys.solution; }
+  NumericVector<Number> & solutionOld() override { return *_sys.old_local_solution; }
+  NumericVector<Number> & solutionOlder() override { return *_sys.older_local_solution; }
+  NumericVector<Number> * solutionPreviousNewton() override { return _solution_previous_nl; }
 
-  virtual NumericVector<Number> & solutionOld() override { return *_sys.old_local_solution; }
-
-  virtual NumericVector<Number> & solutionOlder() override { return *_sys.older_local_solution; }
+  const NumericVector<Number> & solution() const override { return *_sys.solution; }
+  const NumericVector<Number> & solutionOld() const override { return *_sys.old_local_solution; }
+  const NumericVector<Number> & solutionOlder() const override
+  {
+    return *_sys.older_local_solution;
+  }
+  const NumericVector<Number> * solutionPreviousNewton() const override
+  {
+    return _solution_previous_nl;
+  }
 
   virtual TransientExplicitSystem & sys() { return _sys; }
 
   virtual System & system() override { return _sys; }
   virtual const System & system() const override { return _sys; }
-
-  virtual NumericVector<Number> * solutionUDotOld() override { return _u_dot_old; }
-  virtual NumericVector<Number> * solutionUDotDotOld() override { return _u_dotdot_old; }
-  virtual NumericVector<Number> * solutionPreviousNewton() override
-  {
-    return _solution_previous_nl;
-  }
 
   virtual void setPreviousNewtonSolution();
 
@@ -177,17 +186,29 @@ public:
 
   void clearScalarVariableCoupleableTags();
 
-protected:
+  // protected:
   void computeScalarVars(ExecFlagType type);
   void computeNodalVars(ExecFlagType type);
+  void computeNodalVecVars(ExecFlagType type);
   void computeElementalVars(ExecFlagType type);
+  void computeElementalVecVars(ExecFlagType type);
+
+  template <typename AuxKernelType>
+  void computeElementalVarsHelper(const MooseObjectWarehouse<AuxKernelType> & warehouse,
+                                  const std::vector<std::vector<MooseVariableFEBase *>> & vars,
+                                  const PerfID timer);
+
+  template <typename AuxKernelType>
+  void computeNodalVarsHelper(const MooseObjectWarehouse<AuxKernelType> & warehouse,
+                              const std::vector<std::vector<MooseVariableFEBase *>> & vars,
+                              const PerfID timer);
 
   FEProblemBase & _fe_problem;
 
   TransientExplicitSystem & _sys;
 
   /// solution vector from nonlinear solver
-  const NumericVector<Number> * _current_solution;
+  mutable const NumericVector<Number> * _current_solution;
   /// Serialized version of the solution vector
   NumericVector<Number> & _serialized_solution;
   /// Solution vector of the previous nonlinear iterate
@@ -208,28 +229,32 @@ protected:
   bool _need_serialized_solution;
 
   // Variables
-  std::vector<std::map<std::string, MooseVariable *>> _nodal_vars;
-  std::vector<std::map<std::string, MooseVariable *>> _elem_vars;
+  std::vector<std::vector<MooseVariableFEBase *>> _nodal_vars;
+  std::vector<std::vector<MooseVariableFEBase *>> _nodal_std_vars;
+  std::vector<std::vector<MooseVariableFEBase *>> _nodal_vec_vars;
+
+  std::vector<std::vector<MooseVariableFEBase *>> _elem_vars;
+  std::vector<std::vector<MooseVariableFEBase *>> _elem_std_vars;
+  std::vector<std::vector<MooseVariableFEBase *>> _elem_vec_vars;
 
   // Storage for AuxScalarKernel objects
   ExecuteMooseObjectWarehouse<AuxScalarKernel> _aux_scalar_storage;
 
   // Storage for AuxKernel objects
   ExecuteMooseObjectWarehouse<AuxKernel> _nodal_aux_storage;
-
-  // Storage for AuxKernel objects
   ExecuteMooseObjectWarehouse<AuxKernel> _elemental_aux_storage;
 
-  /// Timers
-  PerfID _compute_scalar_vars_timer;
-  PerfID _compute_nodal_vars_timer;
-  PerfID _compute_elemental_vars_timer;
+  // Storage for VectorAuxKernel objects
+  ExecuteMooseObjectWarehouse<VectorAuxKernel> _nodal_vec_aux_storage;
+  ExecuteMooseObjectWarehouse<VectorAuxKernel> _elemental_vec_aux_storage;
 
-  friend class AuxKernel;
-  friend class ComputeNodalAuxVarsThread;
-  friend class ComputeNodalAuxBcsThread;
-  friend class ComputeElemAuxVarsThread;
-  friend class ComputeElemAuxBcsThread;
+  /// Timers
+  const PerfID _compute_scalar_vars_timer;
+  const PerfID _compute_nodal_vars_timer;
+  const PerfID _compute_nodal_vec_vars_timer;
+  const PerfID _compute_elemental_vars_timer;
+  const PerfID _compute_elemental_vec_vars_timer;
+
   friend class ComputeIndicatorThread;
   friend class ComputeMarkerThread;
   friend class FlagElementsThread;
@@ -239,4 +264,3 @@ protected:
   friend class ComputeNodalKernelBCJacobiansThread;
 };
 
-#endif /* EXPLICITSYSTEM_H */

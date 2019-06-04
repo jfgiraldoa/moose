@@ -1,9 +1,12 @@
-/****************************************************************/
-/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
-/*                                                              */
-/*          All contents are licensed under LGPL V2.1           */
-/*             See LICENSE for full restrictions                */
-/****************************************************************/
+//* This file is part of the MOOSE framework
+//* https://www.mooseframework.org
+//*
+//* All rights reserved, see COPYRIGHT for full restrictions
+//* https://github.com/idaholab/moose/blob/master/COPYRIGHT
+//*
+//* Licensed under LGPL 2.1, please see LICENSE for details
+//* https://www.gnu.org/licenses/lgpl-2.1.html
+
 #include "InertialForceBeam.h"
 #include "SubProblem.h"
 #include "libmesh/utility.h"
@@ -70,6 +73,13 @@ validParams<InertialForceBeam>()
 
 InertialForceBeam::InertialForceBeam(const InputParameters & parameters)
   : TimeKernel(parameters),
+    _has_beta(isParamValid("beta")),
+    _has_gamma(isParamValid("gamma")),
+    _has_velocities(isParamValid("velocities")),
+    _has_rot_velocities(isParamValid("rotational_velocities")),
+    _has_accelerations(isParamValid("accelerations")),
+    _has_rot_accelerations(isParamValid("rotational_accelerations")),
+    _has_Ix(isParamValid("Ix")),
     _density(getMaterialProperty<Real>("density")),
     _nrot(coupledComponents("rotations")),
     _ndisp(coupledComponents("displacements")),
@@ -82,11 +92,11 @@ InertialForceBeam::InertialForceBeam(const InputParameters & parameters)
     _area(coupledValue("area")),
     _Ay(coupledValue("Ay")),
     _Az(coupledValue("Az")),
-    _Ix(isParamValid("Ix") ? coupledValue("Ix") : _zero),
+    _Ix(_has_Ix ? coupledValue("Ix") : _zero),
     _Iy(coupledValue("Iy")),
     _Iz(coupledValue("Iz")),
-    _beta(isParamValid("beta") ? getParam<Real>("beta") : 0.1),
-    _gamma(isParamValid("gamma") ? getParam<Real>("gamma") : 0.1),
+    _beta(_has_beta ? getParam<Real>("beta") : 0.1),
+    _gamma(_has_gamma ? getParam<Real>("gamma") : 0.1),
     _eta(getMaterialProperty<Real>("eta")),
     _alpha(getParam<Real>("alpha")),
     _original_local_config(getMaterialPropertyByName<RankTwoTensor>("initial_rotation")),
@@ -100,9 +110,8 @@ InertialForceBeam::InertialForceBeam(const InputParameters & parameters)
     mooseError("InertialForceBeam: The number of variables supplied in 'displacements' and "
                "'rotations' must match.");
 
-  if (isParamValid("beta") && isParamValid("gamma") && isParamValid("velocities") &&
-      isParamValid("accelerations") && isParamValid("rotational_velocities") &&
-      isParamValid("rotational_accelerations"))
+  if (_has_beta && _has_gamma && _has_velocities && _has_accelerations && _has_rot_velocities &&
+      _has_rot_accelerations)
   {
     if ((coupledComponents("velocities") != _ndisp) ||
         (coupledComponents("accelerations") != _ndisp) ||
@@ -129,9 +138,8 @@ InertialForceBeam::InertialForceBeam(const InputParameters & parameters)
       _rot_accel_num[i] = rot_accel_variable->number();
     }
   }
-  else if (!isParamValid("beta") && !isParamValid("gamma") && !isParamValid("velocities") &&
-           !isParamValid("accelerations") && !isParamValid("rotational_velocities") &&
-           !isParamValid("rotational_accelerations"))
+  else if (!_has_beta && !_has_gamma && !_has_velocities && !_has_accelerations &&
+           !_has_rot_velocities && !_has_rot_accelerations)
   {
     _du_dot_du = &coupledDotDu("displacements", 0);
     _du_dotdot_du = &coupledDotDotDu("displacements", 0);
@@ -163,14 +171,14 @@ InertialForceBeam::computeResidual()
   if (_dt != 0.0)
   {
     // fetch the two end nodes for _current_elem
-    std::vector<Node *> node;
+    std::vector<const Node *> node;
     for (unsigned int i = 0; i < 2; ++i)
-      node.push_back(_current_elem->get_node(i));
+      node.push_back(_current_elem->node_ptr(i));
 
     // Fetch the solution for the two end nodes at time t
     NonlinearSystemBase & nonlinear_sys = _fe_problem.getNonlinearSystemBase();
 
-    if (isParamValid("beta"))
+    if (_has_beta)
     {
       const NumericVector<Number> & sol = *nonlinear_sys.currentSolution();
       const NumericVector<Number> & sol_old = nonlinear_sys.solutionOld();
@@ -305,7 +313,7 @@ InertialForceBeam::computeResidual()
       if (_component > 2)
       {
         Real I = _Iy[0] + _Iz[0];
-        if (isParamValid("Ix") && (i == 0))
+        if (_has_Ix && (i == 0))
           I = _Ix[0];
         if (i == 1)
           I = _Iz[0];
@@ -425,7 +433,7 @@ InertialForceBeam::computeJacobian()
   mooseAssert(_beta > 0.0, "InertialForceBeam: Beta parameter should be positive.");
 
   Real factor = 0.0;
-  if (isParamValid("beta"))
+  if (_has_beta)
     factor = 1.0 / (_beta * _dt * _dt) + _eta[0] * (1.0 + _alpha) * _gamma / _beta / _dt;
   else
     factor = (*_du_dotdot_du)[0] + _eta[0] * (1.0 + _alpha) * (*_du_dot_du)[0];
@@ -440,7 +448,7 @@ InertialForceBeam::computeJacobian()
       else if (_component > 2)
       {
         RankTwoTensor I;
-        if (isParamValid("Ix"))
+        if (_has_Ix)
           I(0, 0) = _Ix[0];
         else
           I(0, 0) = _Iy[0] + _Iz[0];
@@ -477,7 +485,7 @@ InertialForceBeam::computeOffDiagJacobian(MooseVariableFEBase & jvar)
   mooseAssert(_beta > 0.0, "InertialForceBeam: Beta parameter should be positive.");
 
   Real factor = 0.0;
-  if (isParamValid("beta"))
+  if (_has_beta)
     factor = 1.0 / (_beta * _dt * _dt) + _eta[0] * (1.0 + _alpha) * _gamma / _beta / _dt;
   else
     factor = (*_du_dotdot_du)[0] + _eta[0] * (1.0 + _alpha) * (*_du_dot_du)[0];
@@ -552,7 +560,7 @@ InertialForceBeam::computeOffDiagJacobian(MooseVariableFEBase & jvar)
           else if (_component > 2 && coupled_component > 2)
           {
             RankTwoTensor I;
-            if (isParamValid("Ix"))
+            if (_has_Ix)
               I(0, 0) = _Ix[0];
             else
               I(0, 0) = _Iy[0] + _Iz[0];

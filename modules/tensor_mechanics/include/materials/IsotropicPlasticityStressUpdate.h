@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ISOTROPICPLASTICITYSTRESSUPDATE_H
-#define ISOTROPICPLASTICITYSTRESSUPDATE_H
+#pragma once
 
 #include "RadialReturnStressUpdate.h"
 
@@ -58,10 +57,10 @@ protected:
   /// a string to prepend to the plastic strain Material Property name
   const std::string _plastic_prepend;
 
-  Function * _yield_stress_function;
+  const Function * _yield_stress_function;
   Real _yield_stress;
   const Real _hardening_constant;
-  Function * _hardening_function;
+  const Function * _hardening_function;
 
   Real _yield_condition;
   Real _hardening_slope;
@@ -76,5 +75,3 @@ protected:
   const MaterialProperty<Real> & _hardening_variable_old;
   const VariableValue & _temperature;
 };
-
-#endif // ISOTROPICPLASTICITYSTRESSUPDATE_H

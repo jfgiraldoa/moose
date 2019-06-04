@@ -7,13 +7,12 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef TEMPERATUREDEPENDENTHARDENINGSTRESSUPDATE_H
-#define TEMPERATUREDEPENDENTHARDENINGSTRESSUPDATE_H
+#pragma once
 
 #include "IsotropicPlasticityStressUpdate.h"
+#include "LinearInterpolation.h"
 
 class PiecewiseLinear;
-class LinearInterpolation;
 
 class TemperatureDependentHardeningStressUpdate;
 
@@ -49,7 +48,7 @@ protected:
 
   ///@{The function names and expressions for hardening as a function of temperature
   const std::vector<FunctionName> _hardening_functions_names;
-  std::vector<PiecewiseLinear *> _hardening_functions;
+  std::vector<const PiecewiseLinear *> _hardening_functions;
   ///@}
 
   /// The temperatures at which each of the hardening functions are defined.
@@ -68,5 +67,3 @@ protected:
    */
   Real _hf_fraction;
 };
-
-#endif // TEMPERATUREDEPENDENTHARDENINGSTRESSUPDATE_H

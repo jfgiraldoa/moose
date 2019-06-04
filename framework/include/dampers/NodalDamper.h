@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef NODALDAMPER_H
-#define NODALDAMPER_H
+#pragma once
 
 // Moose Includes
 #include "Damper.h"
@@ -64,15 +63,14 @@ protected:
   MooseVariable & _var;
 
   /// Current node
-  const Node *& _current_node;
+  const Node * const & _current_node;
 
   /// Quadrature point index
   unsigned int _qp;
 
   /// The current Newton increment
-  VariableValue & _u_increment;
+  const VariableValue & _u_increment;
   /// Holds the current solution at the current node
   const VariableValue & _u;
 };
 
-#endif // NODALDAMPER_H

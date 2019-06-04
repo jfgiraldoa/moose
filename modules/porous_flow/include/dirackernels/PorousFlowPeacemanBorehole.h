@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef POROUSFLOWPEACEMANBOREHOLE_H
-#define POROUSFLOWPEACEMANBOREHOLE_H
+#pragma once
 
 #include "PorousFlowLineSink.h"
 
@@ -41,7 +40,7 @@ protected:
    * pressure, and does nothing otherwise
    * The flow rate to/from the borehole is multiplied by |character|, so usually character = +/- 1
    */
-  Function & _character;
+  const Function & _character;
 
   /// Bottomhole pressure of borehole
   const Real _p_bot;
@@ -87,5 +86,3 @@ protected:
                                     Real & outflow,
                                     Real & outflowp) const override;
 };
-
-#endif // POROUSFLOWPEACEMANBOREHOLE_H

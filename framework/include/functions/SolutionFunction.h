@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef SOLUTIONFUNCTION_H
-#define SOLUTIONFUNCTION_H
+#pragma once
 
 #include "Function.h"
 
@@ -38,7 +37,7 @@ public:
    * @param p Spatial location of desired data
    * @return The value at t and p
    */
-  virtual Real value(Real t, const Point & p) override;
+  virtual Real value(Real t, const Point & p) const override;
 
   /**
    * Extract a gradient from the solution
@@ -46,7 +45,7 @@ public:
    * @param p Spatial location of desired data
    * @return The value at t and p
    */
-  virtual RealGradient gradient(Real t, const Point & p) override;
+  virtual RealGradient gradient(Real t, const Point & p) const override;
 
   /**
    * Setup the function for use
@@ -72,5 +71,3 @@ protected:
   /// Factor to add to the solution if gradient is requested (default = \vec{0})
   RealGradient _add_grad;
 };
-
-#endif // SOLUTIONFUNCTION_H

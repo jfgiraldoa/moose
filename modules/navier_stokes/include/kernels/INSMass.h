@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef INSMASS_H
-#define INSMASS_H
+#pragma once
 
 #include "INSBase.h"
 
@@ -40,9 +39,7 @@ protected:
   virtual Real computeQpPGOffDiagJacobian(unsigned comp);
 
   bool _pspg;
-  Function & _x_ffn;
-  Function & _y_ffn;
-  Function & _z_ffn;
+  const Function & _x_ffn;
+  const Function & _y_ffn;
+  const Function & _z_ffn;
 };
-
-#endif // INSMASS_H

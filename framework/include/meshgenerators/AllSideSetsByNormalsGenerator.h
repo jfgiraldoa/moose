@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ALLSIDESETSBYNORMALSGENERATOR_H
-#define ALLSIDESETSBYNORMALSGENERATOR_H
+#pragma once
 
 #include "SideSetsGeneratorBase.h"
 
@@ -28,7 +27,7 @@ class AllSideSetsByNormalsGenerator : public SideSetsGeneratorBase
 public:
   AllSideSetsByNormalsGenerator(const InputParameters & parameters);
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   boundary_id_type getNextBoundaryID();
@@ -42,4 +41,3 @@ protected:
   std::unique_ptr<MeshBase> & _input;
 };
 
-#endif // ALLSIDESETSBYNORMALSGENERATOR_H

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef SPIRALANNULARMESHGENERATOR_H
-#define SPIRALANNULARMESHGENERATOR_H
+#pragma once
 
 #include "MeshGenerator.h"
 
@@ -29,7 +28,7 @@ public:
   // No copy
   SpiralAnnularMeshGenerator & operator=(const SpiralAnnularMeshGenerator & other_mesh) = delete;
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   /// Radius of the inner circle
@@ -64,4 +63,3 @@ protected:
   const Real _initial_delta_r;
 };
 
-#endif // SPIRALANNULARMESHGENERATOR_H

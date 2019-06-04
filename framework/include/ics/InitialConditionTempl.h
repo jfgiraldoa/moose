@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef INITIALCONDITIONTEMPL_H
-#define INITIALCONDITIONTEMPL_H
+#pragma once
 
 #include "InitialConditionBase.h"
 
@@ -112,7 +111,7 @@ protected:
 
   /// The current element we are on will retrieving values at specific points in the domain. Note
   /// that this _IS_ valid even for nodes shared among several elements.
-  const Elem *& _current_elem;
+  const Elem * const & _current_elem;
 
   /// The current node if the point we are evaluating at also happens to be a node.
   /// Otherwise the pointer will be NULL.
@@ -172,4 +171,3 @@ protected:
 
 typedef InitialConditionTempl<Real> InitialCondition;
 typedef InitialConditionTempl<RealVectorValue> VectorInitialCondition;
-#endif // INITIALCONDITIONTEMPL_H

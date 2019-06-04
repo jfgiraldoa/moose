@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PRESSUREACTION_H
-#define PRESSUREACTION_H
+#pragma once
 
 #include "Action.h"
 
@@ -20,6 +19,9 @@ public:
   virtual void act() override;
 
 protected:
+  /// Flag to use automatic differentiation
+  const bool _use_ad;
+
   std::vector<std::vector<AuxVariableName>> _save_in_vars;
   std::vector<bool> _has_save_in_vars;
 };
@@ -27,4 +29,3 @@ protected:
 template <>
 InputParameters validParams<PressureAction>();
 
-#endif // PRESSUREACTION_H

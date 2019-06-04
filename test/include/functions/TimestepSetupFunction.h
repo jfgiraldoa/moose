@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef TIMESTEPSETUPFUNCTION_H
-#define TIMESTEPSETUPFUNCTION_H
+#pragma once
 
 #include "Function.h"
 
@@ -22,12 +21,10 @@ class TimestepSetupFunction : public Function
 public:
   TimestepSetupFunction(const InputParameters & parameters);
 
-  virtual Real value(Real t, const Point & p);
+  virtual Real value(Real t, const Point & p) const;
 
   virtual void timestepSetup();
 
 private:
   unsigned int & _local_timestep;
 };
-
-#endif // TIMESTEPSETUPFUNCTION_H

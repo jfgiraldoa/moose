@@ -73,7 +73,7 @@
 
 [Kernels]
   [./heat]
-    type = HeatConduction
+    type = Diffusion
     variable = temp
   [../]
 
@@ -145,46 +145,25 @@
                99900      10e3'
     property = youngs_modulus
     variable = temp
-    block = 0
   [../]
-
   [./elasticity_tensor]
     type = ComputeVariableIsotropicElasticityTensor
     args = temp
     youngs_modulus = youngs_modulus
     poissons_ratio = 0.0
-    block = 0
   [../]
   [./strain]
     type = ComputeIncrementalSmallStrain
-    block = 0
   [../]
   [./stress]
-    type=ComputeFiniteStrainElasticStress
-    block = 0
-  [../]
-  [./heat1]
-    type = HeatConductionMaterial
-    block = 0
-    specific_heat = 1.0
-    thermal_conductivity = 1.0
+    type = ComputeFiniteStrainElasticStress
   [../]
 []
 
 [Executioner]
   type = Transient
-  solve_type = 'PJFNK'
 
-  l_max_its = 30
-  nl_max_its = 30
-
-  nl_rel_tol = 1e-8
-  nl_abs_tol = 1e-6
-  l_tol = 1e-5
-
-  start_time = 0.0
   end_time = 5
-  dt = 1
 []
 
 [Postprocessors]
@@ -204,7 +183,5 @@
 []
 
 [Outputs]
-  [./out]
-    type = Exodus
-  [../]
+  exodus = true
 []

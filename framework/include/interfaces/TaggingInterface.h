@@ -1,19 +1,13 @@
-/****************************************************************/
-/*               DO NOT MODIFY THIS HEADER                      */
-/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
-/*                                                              */
-/*           (c) 2010 Battelle Energy Alliance, LLC             */
-/*                   ALL RIGHTS RESERVED                        */
-/*                                                              */
-/*          Prepared by Battelle Energy Alliance, LLC           */
-/*            Under Contract No. DE-AC07-05ID14517              */
-/*            With the U. S. Department of Energy               */
-/*                                                              */
-/*            See COPYRIGHT for full restrictions               */
-/****************************************************************/
+//* This file is part of the MOOSE framework
+//* https://www.mooseframework.org
+//*
+//* All rights reserved, see COPYRIGHT for full restrictions
+//* https://github.com/idaholab/moose/blob/master/COPYRIGHT
+//*
+//* Licensed under LGPL 2.1, please see LICENSE for details
+//* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef TAGGINGINTERFACE_H
-#define TAGGINGINTERFACE_H
+#pragma once
 
 #include "MooseTypes.h"
 #include "MultiMooseEnum.h"
@@ -74,6 +68,13 @@ public:
   void prepareVectorTagNeighbor(Assembly & assembly, unsigned int ivar);
 
   /**
+   * Prepare data for computing the residual according to active tags for mortar constraints.
+   * Residual blocks for different tags will be extracted from Assembly.  A local residual will be
+   * zeroed. It should be called right before the local element vector is computed.
+   */
+  void prepareVectorTagLower(Assembly & assembly, unsigned int ivar);
+
+  /**
    * Prepare data for computing element jacobian according to the ative tags.
    * Jacobian blocks for different tags will be extracted from Assembly.
    * A local Jacobian will be zeroed. It should be called
@@ -92,6 +93,16 @@ public:
                                 unsigned int ivar,
                                 unsigned int jvar,
                                 Moose::DGJacobianType type);
+
+  /**
+   * Prepare data for computing the jacobian according to the ative tags for mortar.  Jacobian
+   * blocks for different tags will be extracted from Assembly.  A local Jacobian will be zeroed. It
+   * should be called right before the local element matrix is computed.
+   */
+  void prepareMatrixTagLower(Assembly & assembly,
+                             unsigned int ivar,
+                             unsigned int jvar,
+                             Moose::ConstraintJacobianType type);
 
   /**
    * Local residual blocks  will be appended by adding the current local kernel residual.
@@ -146,4 +157,15 @@ protected:
   DenseMatrix<Number> _local_ke;
 };
 
-#endif /* TAGGINGINTERFACE_H */
+#define usingTaggingInterfaceMembers                                                               \
+  using TaggingInterface::_subproblem;                                                             \
+  using TaggingInterface::accumulateTaggedLocalResidual;                                           \
+  using TaggingInterface::accumulateTaggedLocalMatrix;                                             \
+  using TaggingInterface::prepareVectorTag;                                                        \
+  using TaggingInterface::prepareMatrixTag;                                                        \
+  using TaggingInterface::prepareVectorTagNeighbor;                                                \
+  using TaggingInterface::_local_re;                                                               \
+  using TaggingInterface::prepareVectorTagLower;                                                   \
+  using TaggingInterface::prepareMatrixTagNeighbor;                                                \
+  using TaggingInterface::prepareMatrixTagLower;                                                   \
+  using TaggingInterface::_local_ke

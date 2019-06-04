@@ -7,17 +7,16 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ADTIMEKERNEL_H
-#define ADTIMEKERNEL_H
+#pragma once
 
-#include "ADKernelValue.h"
+#include "ADKernel.h"
 
 /**
  * All AD time kernels should inherit from this class
  *
  */
 template <typename T, ComputeStage compute_stage>
-class ADTimeKernelTempl : public ADKernelValueTempl<T, compute_stage>
+class ADTimeKernelTempl : public ADKernelTempl<T, compute_stage>
 {
 public:
   ADTimeKernelTempl(const InputParameters & parameters);
@@ -26,7 +25,7 @@ protected:
   /// Holds the time derivatives at the quadrature points
   const ADTemplateVariableValue & _u_dot;
 
-  usingTemplKernelValueMembers(T);
+  usingTemplKernelMembers(T);
 };
 
 template <ComputeStage compute_stage>
@@ -38,10 +37,9 @@ declareADValidParams(ADTimeKernel);
 declareADValidParams(ADVectorTimeKernel);
 
 #define usingTemplTimeKernelMembers(type)                                                          \
-  usingTemplKernelValueMembers(type);                                                              \
+  usingTemplKernelMembers(type);                                                                   \
   using ADTimeKernelTempl<type, compute_stage>::_u_dot
 
 #define usingTimeKernelMembers usingTemplTimeKernelMembers(Real)
 #define usingVectorTimeKernelMembers usingTemplTimeKernelMembers(RealVectorValue)
 
-#endif // ADTIMEKERNEL_H

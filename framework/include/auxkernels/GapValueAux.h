@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef GAPVALUEAUX_H
-#define GAPVALUEAUX_H
+#pragma once
 
 #include "AuxKernel.h"
 
@@ -31,11 +30,10 @@ protected:
 
   MooseVariable & _moose_var;
 
-  const NumericVector<Number> *& _serialized_solution;
+  const NumericVector<Number> * const & _serialized_solution;
 
   const DofMap & _dof_map;
 
   const bool _warnings;
 };
 
-#endif // GAPVALUEAUX_H

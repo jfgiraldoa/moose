@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PARSEDMATERIALHELPER_H
-#define PARSEDMATERIALHELPER_H
+#pragma once
 
 #include "FunctionMaterialBase.h"
 #include "FunctionParserUtils.h"
@@ -49,7 +48,8 @@ public:
                      const std::vector<Real> & tol_values);
 
 protected:
-  virtual void computeProperties();
+  virtual void initQpStatefulProperties();
+  virtual void computeQpProperties();
 
   // tasks to perform after parsing the primary function
   virtual void functionsPostParse();
@@ -81,4 +81,3 @@ protected:
   const VariableNameMappingMode _map_mode;
 };
 
-#endif // PARSEDMATERIALHELPER_H

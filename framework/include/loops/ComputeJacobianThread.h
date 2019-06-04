@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef COMPUTEJACOBIANTHREAD_H
-#define COMPUTEJACOBIANTHREAD_H
+#pragma once
 
 #include "ThreadedElementLoop.h"
 #include "MooseObjectTagWarehouse.h"
@@ -20,7 +19,7 @@ class FEProblemBase;
 class NonlinearSystemBase;
 class IntegratedBCBase;
 class DGKernelBase;
-class InterfaceKernel;
+class InterfaceKernelBase;
 class Kernel;
 
 class ComputeJacobianThread : public ThreadedElementLoop<ConstElemRange>
@@ -59,9 +58,9 @@ protected:
   MooseObjectWarehouse<DGKernelBase> * _dg_warehouse;
 
   // Reference to interface kernel storage structure
-  MooseObjectTagWarehouse<InterfaceKernel> & _interface_kernels;
+  MooseObjectTagWarehouse<InterfaceKernelBase> & _interface_kernels;
 
-  MooseObjectWarehouse<InterfaceKernel> * _ik_warehouse;
+  MooseObjectWarehouse<InterfaceKernelBase> * _ik_warehouse;
 
   // Reference to Kernel storage structure
   MooseObjectTagWarehouse<KernelBase> & _kernels;
@@ -82,5 +81,3 @@ protected:
   virtual void computeInternalFaceJacobian(const Elem * neighbor);
   virtual void computeInternalInterFaceJacobian(BoundaryID bnd_id);
 };
-
-#endif // COMPUTEJACOBIANTHREAD_H

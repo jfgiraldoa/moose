@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef Q2PPIECEWISELINEARSINK
-#define Q2PPIECEWISELINEARSINK
+#pragma once
 
 #include "IntegratedBC.h"
 #include "LinearInterpolation.h"
@@ -63,7 +62,7 @@ protected:
   LinearInterpolation _sink_func;
 
   /// sink flux gets multiplied by this function
-  Function & _m_func;
+  const Function & _m_func;
 
   /// fluid density
   const RichardsDensity & _density;
@@ -113,5 +112,3 @@ protected:
   /// derivative of residual wrt the wrt_num variable
   Real jac(unsigned int wrt_num);
 };
-
-#endif // Q2PPIECEWISELINEARSINK

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ADDSIDESETSFROMBOUNDINGBOX_H
-#define ADDSIDESETSFROMBOUNDINGBOX_H
+#pragma once
 
 // MOOSE includes
 #include "MooseEnum.h"
@@ -45,9 +44,6 @@ private:
   /// ID location (inside of outside of box)
   MooseEnum _location;
 
-  /// Block ID to assign to the region
-  SubdomainID _block_id;
-
   /// boundary ID to select
   std::vector<BoundaryName> _boundary_id_old;
 
@@ -61,4 +57,3 @@ private:
   const bool _boundary_id_overlap;
 };
 
-#endif // ADDSIDESETSFROMBOUNDINGBOX_H

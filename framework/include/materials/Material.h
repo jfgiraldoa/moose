@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MATERIAL_H
-#define MATERIAL_H
+#pragma once
 
 // MOOOSE includes
 #include "MaterialProperty.h"
@@ -222,19 +221,19 @@ protected:
 
   unsigned int _qp;
 
-  QBase *& _qrule;
+  const QBase * const & _qrule;
   const MooseArray<Real> & _JxW;
   const MooseArray<Real> & _coord;
   const MooseArray<Point> & _q_point;
   /// normals at quadrature points (valid only in boundary materials)
   const MooseArray<Point> & _normals;
 
-  const Elem *& _current_elem;
+  const Elem * const & _current_elem;
 
   const SubdomainID & _current_subdomain_id;
 
   /// current side of the current element
-  unsigned int & _current_side;
+  const unsigned int & _current_side;
 
   MooseMesh & _mesh;
 
@@ -467,4 +466,3 @@ Material::getZeroMaterialProperty(const std::string & prop_name)
   return preload_with_zero;
 }
 
-#endif // MATERIAL_H

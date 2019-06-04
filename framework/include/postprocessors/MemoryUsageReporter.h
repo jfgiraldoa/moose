@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MEMORYUSAGEREPORTER_H
-#define MEMORYUSAGEREPORTER_H
+#pragma once
 
 #include "Moose.h"
 #include "MooseObject.h"
@@ -33,7 +32,7 @@ protected:
   processor_id_type _nrank;
 
   /// hardware IDs for each MPI rank (valid on rank zero only)
-  std::vector<unsigned int> _hardware_id;
+  const std::vector<unsigned int> & _hardware_id;
 
   /// total RAM installed in the local node
   unsigned long long _memory_total;
@@ -49,4 +48,3 @@ private:
   void sharedMemoryRanksByProcessorname();
 };
 
-#endif // MEMORYUSAGEREPORTER_H

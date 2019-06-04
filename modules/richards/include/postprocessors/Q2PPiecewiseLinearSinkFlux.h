@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef Q2PPIECEWISELINEARSINKFLUX_H
-#define Q2PPIECEWISELINEARSINKFLUX_H
+#pragma once
 
 #include "SideIntegralPostprocessor.h"
 #include "LinearInterpolation.h"
@@ -44,7 +43,7 @@ protected:
   LinearInterpolation _sink_func;
 
   /// the multiplier function
-  Function & _m_func;
+  const Function & _m_func;
 
   /// the porepressure variable
   const VariableValue & _pp;
@@ -70,5 +69,3 @@ protected:
   /// medium permeability
   const MaterialProperty<RealTensorValue> & _permeability;
 };
-
-#endif

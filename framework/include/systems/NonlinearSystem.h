@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef NONLINEARSYSTEM_H
-#define NONLINEARSYSTEM_H
+#pragma once
 
 #include "NonlinearSystemBase.h"
 #include "ComputeResidualFunctor.h"
@@ -58,12 +57,14 @@ public:
     return _transient_sys.nonlinear_solver.get();
   }
 
-  virtual NumericVector<Number> & solutionOld() override
+  NumericVector<Number> & solutionOld() override { return *_transient_sys.old_local_solution; }
+  const NumericVector<Number> & solutionOld() const override
   {
     return *_transient_sys.old_local_solution;
   }
 
-  virtual NumericVector<Number> & solutionOlder() override
+  NumericVector<Number> & solutionOlder() override { return *_transient_sys.older_local_solution; }
+  const NumericVector<Number> & solutionOlder() const override
   {
     return *_transient_sys.older_local_solution;
   }
@@ -98,4 +99,3 @@ private:
   bool _use_coloring_finite_difference;
 };
 
-#endif /* NONLINEARSYSTEM_H */

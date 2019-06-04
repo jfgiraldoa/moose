@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ELEMENTW1PERROR_H
-#define ELEMENTW1PERROR_H
+#pragma once
 
 #include "ElementIntegralVariablePostprocessor.h"
 
@@ -47,7 +46,5 @@ protected:
 
   // The exponent used in the norm
   Real _p;
-  Function & _func;
+  const Function & _func;
 };
-
-#endif // ELEMENTW1PERROR_H

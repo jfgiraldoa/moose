@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef POSTPROCESSORFUNCTION_H
-#define POSTPROCESSORFUNCTION_H
+#pragma once
 
 #include "Function.h"
 
@@ -22,10 +21,8 @@ class PostprocessorFunction : public Function
 public:
   PostprocessorFunction(const InputParameters & parameters);
 
-  virtual Real value(Real t, const Point & p);
+  virtual Real value(Real t, const Point & p) const;
 
 protected:
   const PostprocessorValue & _pp;
 };
-
-#endif // POSTPROCESSORFUNCTION_H

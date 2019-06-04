@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MOOSEOBJECT_H
-#define MOOSEOBJECT_H
+#pragma once
 
 // MOOSE includes
 #include "InputParameters.h"
@@ -16,6 +15,10 @@
 #include "Registry.h"
 
 #include "libmesh/parallel_object.h"
+
+#define usingMooseObjectMembers                                                                    \
+  using MooseObject::isParamValid;                                                                 \
+  using MooseObject::paramError
 
 class MooseApp;
 class MooseObject;
@@ -190,4 +193,3 @@ MooseObject::getParam(const std::string & name) const
   return InputParameters::getParamHelper(name, _pars, static_cast<T *>(0));
 }
 
-#endif /* MOOSEOBJECT_H*/

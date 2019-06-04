@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef RICHARDSEXCAVFLOW_H
-#define RICHARDSEXCAVFLOW_H
+#pragma once
 
 #include "SideIntegralVariablePostprocessor.h"
 #include "MaterialPropertyInterface.h"
@@ -42,7 +41,5 @@ protected:
   const MaterialProperty<std::vector<RealVectorValue>> & _flux;
 
   /// the RichardsExcavGeom that defines where on the boundary we'll compute the mass flux
-  Function & _func;
+  const Function & _func;
 };
-
-#endif // RICHARDSEXCAVFLOW_H

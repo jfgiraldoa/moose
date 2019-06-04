@@ -1,3 +1,12 @@
+//* This file is part of the MOOSE framework
+//* https://www.mooseframework.org
+//*
+//* All rights reserved, see COPYRIGHT for full restrictions
+//* https://github.com/idaholab/moose/blob/master/COPYRIGHT
+//*
+//* Licensed under LGPL 2.1, please see LICENSE for details
+//* https://www.gnu.org/licenses/lgpl-2.1.html
+
 #include "MomentumFreeSlipBC.h"
 #include "MooseMesh.h"
 #include "MooseVariable.h"
@@ -50,10 +59,10 @@ MomentumFreeSlipBC::computeQpResidual()
       else if (_mesh_dimension == 2)
       {
         MooseVariable & rho_u_var = *getVar("rho_u", 0);
-        dof_id_type & rho_u_dof_idx = rho_u_var.nodalDofIndex();
+        auto && rho_u_dof_idx = rho_u_var.nodalDofIndex();
 
         MooseVariable & rho_v_var = *getVar("rho_v", 0);
-        dof_id_type & rho_v_dof_idx = rho_v_var.nodalDofIndex();
+        auto && rho_v_dof_idx = rho_v_var.nodalDofIndex();
 
         Real rho_un = _normal(0) * _rho_u[0] + _normal(1) * _rho_v[0];
         Real Re_u = residual(rho_u_dof_idx);

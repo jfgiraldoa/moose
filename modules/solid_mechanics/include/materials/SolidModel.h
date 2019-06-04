@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef SOLIDMODEL_H
-#define SOLIDMODEL_H
+#pragma once
 
 #include "DerivativeMaterialInterface.h"
 #include "SymmTensor.h"
@@ -53,7 +52,7 @@ public:
     CR_UNKNOWN
   };
 
-  QBase * qrule() { return _qrule; }
+  const QBase * qrule() { return _qrule; }
   const Point & q_point(unsigned i) const { return _q_point[i]; }
   Real JxW(unsigned i) const { return _JxW[i]; }
 
@@ -74,15 +73,15 @@ protected:
   Real _shear_modulus;
   Real _youngs_modulus;
 
-  Function * _youngs_modulus_function;
-  Function * _poissons_ratio_function;
+  const Function * _youngs_modulus_function;
+  const Function * _poissons_ratio_function;
 
   const CRACKING_RELEASE _cracking_release;
   Real _cracking_stress;
   const Real _cracking_residual_stress;
   const Real _cracking_beta;
   const std::string _compute_method;
-  Function * const _cracking_stress_function;
+  const Function * const _cracking_stress_function;
 
   Real _cracking_alpha;
   std::vector<unsigned int> _active_crack_planes;
@@ -96,7 +95,7 @@ protected:
   const VariableValue & _temperature_old;
   const VariableGradient & _temp_grad;
   const Real _alpha;
-  Function * _alpha_function;
+  const Function * _alpha_function;
   PiecewiseLinear * _piecewise_linear_alpha_function;
   bool _has_stress_free_temp;
   Real _stress_free_temp;
@@ -272,5 +271,3 @@ private:
 
   SymmElasticityTensor * _local_elasticity_tensor;
 };
-
-#endif

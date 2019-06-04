@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ELEMENTUSEROBJECT_H
-#define ELEMENTUSEROBJECT_H
+#pragma once
 
 // MOOSE includes
 #include "UserObject.h"
@@ -50,15 +49,13 @@ protected:
   MooseMesh & _mesh;
 
   /// The current element pointer (available during execute())
-  const Elem *& _current_elem;
+  const Elem * const & _current_elem;
 
   /// The current element volume (available during execute())
   const Real & _current_elem_volume;
 
   const MooseArray<Point> & _q_point;
-  QBase *& _qrule;
+  const QBase * const & _qrule;
   const MooseArray<Real> & _JxW;
   const MooseArray<Real> & _coord;
 };
-
-#endif

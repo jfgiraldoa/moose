@@ -1,9 +1,11 @@
-/****************************************************************/
-/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
-/*                                                              */
-/*          All contents are licensed under LGPL V2.1           */
-/*             See LICENSE for full restrictions                */
-/****************************************************************/
+//* This file is part of the MOOSE framework
+//* https://www.mooseframework.org
+//*
+//* All rights reserved, see COPYRIGHT for full restrictions
+//* https://github.com/idaholab/moose/blob/master/COPYRIGHT
+//*
+//* Licensed under LGPL 2.1, please see LICENSE for details
+//* https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "ComputeIncrementalBeamStrain.h"
 #include "MooseMesh.h"
@@ -59,6 +61,7 @@ validParams<ComputeIncrementalBeamStrain>()
 
 ComputeIncrementalBeamStrain::ComputeIncrementalBeamStrain(const InputParameters & parameters)
   : Material(parameters),
+    _has_Ix(isParamValid("Ix")),
     _nrot(coupledComponents("rotations")),
     _ndisp(coupledComponents("displacements")),
     _rot_num(_nrot),
@@ -68,7 +71,7 @@ ComputeIncrementalBeamStrain::ComputeIncrementalBeamStrain(const InputParameters
     _Az(coupledValue("Az")),
     _Iy(coupledValue("Iy")),
     _Iz(coupledValue("Iz")),
-    _Ix(isParamValid("Ix") ? coupledValue("Ix") : _zero),
+    _Ix(_has_Ix ? coupledValue("Ix") : _zero),
     _original_length(declareProperty<Real>("original_length")),
     _total_rotation(declareProperty<RankTwoTensor>("total_rotation")),
     _total_disp_strain(declareProperty<RealVectorValue>("total_disp_strain")),
@@ -173,9 +176,9 @@ void
 ComputeIncrementalBeamStrain::computeProperties()
 {
   // fetch the two end nodes for current element
-  std::vector<Node *> node;
+  std::vector<const Node *> node;
   for (unsigned int i = 0; i < 2; ++i)
-    node.push_back(_current_elem->get_node(i));
+    node.push_back(_current_elem->node_ptr(i));
 
   // calculate original length of a beam element
   // Nodal positions do not change with time as undisplaced mesh is used by material classes by
@@ -220,7 +223,7 @@ void
 ComputeIncrementalBeamStrain::computeQpStrain()
 {
   Real Ix = _Ix[_qp];
-  if (!isParamValid("Ix"))
+  if (!_has_Ix)
     Ix = _Iy[_qp] + _Iz[_qp];
 
   // Rotate the gradient of displacements and rotations at t+delta t from global coordinate
@@ -328,7 +331,7 @@ ComputeIncrementalBeamStrain::computeStiffnessMatrix()
   const Real Iy_avg = (_Iy[0] + _Iy[1]) / 2.0;
   const Real Iz_avg = (_Iz[0] + _Iz[1]) / 2.0;
   Real Ix_avg = (_Ix[0] + _Ix[1]) / 2.0;
-  if (!isParamValid("Ix"))
+  if (!_has_Ix)
     Ix_avg = Iy_avg + Iz_avg;
 
   // K = |K11 K12|

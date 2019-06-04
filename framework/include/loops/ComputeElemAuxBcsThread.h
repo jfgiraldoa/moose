@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef COMPUTEELEMAUXBCSTHREAD_H
-#define COMPUTEELEMAUXBCSTHREAD_H
+#pragma once
 
 // MOOSE includes
 #include "MooseObjectWarehouse.h"
@@ -18,13 +17,14 @@
 // Forward declarations
 class FEProblemBase;
 class AuxiliarySystem;
-class AuxKernel;
 
+template <typename AuxKernelType>
 class ComputeElemAuxBcsThread
 {
 public:
   ComputeElemAuxBcsThread(FEProblemBase & problem,
-                          const MooseObjectWarehouse<AuxKernel> & storage,
+                          const MooseObjectWarehouse<AuxKernelType> & storage,
+                          const std::vector<std::vector<MooseVariableFEBase *>> & vars,
                           bool need_materials);
   // Splitting Constructor
   ComputeElemAuxBcsThread(ComputeElemAuxBcsThread & x, Threads::split split);
@@ -39,9 +39,10 @@ protected:
   THREAD_ID _tid;
 
   /// Storage object containing active AuxKernel objects
-  const MooseObjectWarehouse<AuxKernel> & _storage;
+  const MooseObjectWarehouse<AuxKernelType> & _storage;
+
+  const std::vector<std::vector<MooseVariableFEBase *>> & _aux_vars;
 
   bool _need_materials;
 };
 
-#endif // COMPUTEELEMAUXBCSTHREAD_H

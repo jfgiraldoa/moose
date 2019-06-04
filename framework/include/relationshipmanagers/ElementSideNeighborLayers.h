@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ELEMENTSIDENEIGHBORLAYERS_H
-#define ELEMENTSIDENEIGHBORLAYERS_H
+#pragma once
 
 #include "FunctorRelationshipManager.h"
 
@@ -40,9 +39,5 @@ protected:
   /// Size of the halo or stencil of elements available in each local processors partition. Only
   /// applicable and necessary when using DistributedMesh.
   unsigned short _layers;
-
-  /// Whether or not this RM is keeping track of periodic boundaries
-  bool _has_periodic_boundaries = false;
 };
 
-#endif /* ELEMENTSIDENEIGHBORLAYERS_H */

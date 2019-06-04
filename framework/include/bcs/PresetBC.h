@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PRESETBC_H
-#define PRESETBC_H
+#pragma once
 
 #include "PresetNodalBC.h"
 
@@ -18,7 +17,8 @@ template <>
 InputParameters validParams<PresetBC>();
 
 /**
- * TODO:
+ * Defines a boundary condition that (pre)sets the solution at the boundary
+ * to be a user specified value.
  */
 class PresetBC : public PresetNodalBC
 {
@@ -31,4 +31,3 @@ protected:
   const Real & _value;
 };
 
-#endif /* PRESETBC_H */

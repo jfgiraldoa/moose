@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef COMPUTEMEANTHERMALEXPANSIONFUNCTIONEIGENSTRAIN_H
-#define COMPUTEMEANTHERMALEXPANSIONFUNCTIONEIGENSTRAIN_H
+#pragma once
 
 #include "ComputeMeanThermalExpansionEigenstrainBase.h"
 
@@ -49,9 +48,7 @@ protected:
    */
   virtual Real meanThermalExpansionCoefficientDerivative(const Real temperature) override;
 
-  Function & _thermal_expansion_function;
+  const Function & _thermal_expansion_function;
 
   const Real & _thexp_func_ref_temp;
 };
-
-#endif // COMPUTEMEANTHERMALEXPANSIONFUNCTIONEIGENSTRAIN_H

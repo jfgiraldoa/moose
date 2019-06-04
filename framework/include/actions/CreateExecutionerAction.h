@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef CREATEEXECUTIONERACTION_H
-#define CREATEEXECUTIONERACTION_H
+#pragma once
 
 #include "MooseObjectAction.h"
 
@@ -23,6 +22,10 @@ public:
   CreateExecutionerAction(InputParameters params);
 
   virtual void act() override;
-};
 
-#endif // CREATEEXECUTIONERACTION_H
+protected:
+  virtual void setupAutoPreconditioning();
+
+private:
+  const bool _auto_preconditioning;
+};

@@ -9,7 +9,7 @@
 
 import platform, re, os, pkgutil
 from TestHarness import util
-from TestHarness.StatusSystem import TestStatus
+from TestHarness.StatusSystem import StatusSystem
 from FactorySystem.MooseObject import MooseObject
 from tempfile import TemporaryFile
 import subprocess
@@ -106,6 +106,10 @@ class Tester(MooseObject):
         self.tags = params['tags']
         self.__caveats = set([])
 
+        # Alternate text we want to print as part of our status instead of the
+        # pre-formatted status text (SYNTAX PASS instead of OK for example)
+        self.__tester_message = ''
+
         # Bool if test can run
         self._runnable = None
 
@@ -116,72 +120,64 @@ class Tester(MooseObject):
         if self.specs["allow_test_objects"]:
             self.specs["cli_args"].append("--allow-test-objects")
 
-    def initStatusSystem(self, options):
-        """ Initialize the tester status system """
-        self.status = TestStatus(options)
+        ### Enumerate the tester statuses we want to use
+        self.test_status = StatusSystem()
+        self.no_status = self.test_status.no_status
+        self.queued = self.test_status.queued
+        self.skip = self.test_status.skip
+        self.silent = self.test_status.silent
+        self.success = self.test_status.success
+        self.fail = self.test_status.fail
+        self.diff = self.test_status.diff
+        self.deleted = self.test_status.deleted
 
-        ### Enumerate the statuses
-        self.no_status = self.status.no_status
-        self.skip = self.status.skip
-        self.silent = self.status.silent
-        self.success = self.status.success
-        self.fail = self.status.fail
-        self.diff = self.status.diff
-        self.deleted = self.status.deleted
-        self.finished = self.status.finished
-
-        ### Deprecated statuses to be removed upon application fixes
-        self.bucket_initialized        = self.no_status
-        self.bucket_success            = self.success
-        self.bucket_fail               = self.fail
-        self.bucket_diff               = self.diff
-        self.bucket_finished           = self.finished
-        self.bucket_deleted            = self.deleted
-        self.bucket_skip               = self.skip
-        self.bucket_silent             = self.silent
-        self.bucket_pending            = None
-        self.bucket_queued             = None
-        self.bucket_waiting_processing = None
-        ### END Deprecated statuses
+        self.__failed_statuses = [self.fail, self.diff, self.deleted]
+        self.__skipped_statuses = [self.skip, self.silent]
 
     def getStatus(self):
-        return self.status.getStatus()
+        return self.test_status.getStatus()
 
     def setStatus(self, status, message=''):
-        # Support deprecated statuses, alert the user.
-        if type(status) == type(''):
-            self.addCaveats('deprecated status bucket')
-            test_status = self.createStatus()
-            result_status = message.status
-            result_color = message.color
-            new_status = test_status(status=result_status, color=result_color)
-            return self.status.setStatus(new_status)
+        self.__tester_message = message
+        return self.test_status.setStatus(status)
 
-        return self.status.setStatus(status, message)
+    def createStatus(self):
+        return self.test_status.createStatus()
+
+    # Return a tuple (status, message, caveats) for this tester as found
+    # in the .previous_test_results.json file (or supplied json object)
+    def previousTesterStatus(self, options, previous_results=None):
+        if not previous_results:
+            previous_results = options.results_storage
+
+        status_exists = previous_results.get(self.getTestDir(), {}).get(self.getTestName(), None)
+        status = (self.test_status.createStatus(), '', '')
+        if status_exists:
+            status = (self.test_status.createStatus(status_exists['STATUS'].encode('ascii', 'ignore')),
+                      status_exists['STATUS_MESSAGE'].encode('ascii', 'ignore'),
+                      status_exists['CAVEATS'])
+        return (status)
 
     def getStatusMessage(self):
-        return self.status.getStatusMessage()
-    def createStatus(self):
-        return self.status.createStatus()
-    def getColor(self):
-        return self.status.getColor()
+        return self.__tester_message
+
+    # Return a boolean based on current status
     def isNoStatus(self):
-        return self.status.isNoStatus()
+        return self.getStatus() == self.no_status
     def isSkip(self):
-        return self.status.isSkip()
+        return self.getStatus() in self.__skipped_statuses
+    def isQueued(self):
+        return self.getStatus() == self.queued
     def isSilent(self):
-        return self.status.isSilent()
+        return self.getStatus() == self.silent
     def isPass(self):
-        return self.status.isPass()
+        return self.getStatus() == self.success
     def isFail(self):
-        return self.status.isFail()
+        return self.getStatus() in self.__failed_statuses
     def isDiff(self):
-        return self.status.isDiff()
+        return self.getStatus() == self.diff
     def isDeleted(self):
-        return self.status.isDeleted()
-    def isFinished(self):
-        return self.status.isFinished()
-    ### Status System wrapper methods ###
+        return self.getStatus() == self.deleted
 
     def getTestName(self):
         """ return test name """
@@ -405,17 +401,9 @@ class Tester(MooseObject):
             self.setStatus(self.silent)
             return False
 
-        # If something has already deemed this test a failure or is silent, return now
-        if self.isFail() or self.isSilent():
+        # If something has already deemed this test a failure
+        if self.isFail():
             return False
-
-        # Check if we only want to run failed tests
-        if options.failed_tests and options.results_storage is not None:
-            result_key = options.results_storage.get(self.getTestDir(), {})
-            status = result_key.get(self.getTestName(), {}).get('FAIL', '')
-            if not status:
-                self.setStatus(self.silent)
-                return False
 
         # Check if we only want to run syntax tests
         if options.check_input and not self.specs['check_input']:
@@ -486,15 +474,15 @@ class Tester(MooseObject):
             reasons['recover'] = 'NO RECOVER'
 
         # Check for PETSc versions
-        (petsc_status, logic_reason, petsc_version) = util.checkPetscVersion(checks, self.specs)
+        (petsc_status, petsc_version) = util.checkPetscVersion(checks, self.specs)
         if not petsc_status:
-            reasons['petsc_version'] = 'using PETSc ' + str(checks['petsc_version']) + ' REQ: ' + logic_reason + ' ' + petsc_version
+            reasons['petsc_version'] = 'using PETSc ' + str(checks['petsc_version']) + ' REQ: ' + petsc_version
 
         # Check for SLEPc versions
-        (slepc_status, logic_reason, slepc_version) = util.checkSlepcVersion(checks, self.specs)
+        (slepc_status, slepc_version) = util.checkSlepcVersion(checks, self.specs)
         if not slepc_status and len(self.specs['slepc_version']) != 0:
             if slepc_version != None:
-                reasons['slepc_version'] = 'using SLEPc ' + str(checks['slepc_version']) + ' REQ: ' + logic_reason + ' ' + slepc_version
+                reasons['slepc_version'] = 'using SLEPc ' + str(checks['slepc_version']) + ' REQ: ' + slepc_version
             elif slepc_version == None:
                 reasons['slepc_version'] = 'SLEPc is not installed'
 
@@ -596,7 +584,10 @@ class Tester(MooseObject):
             # If the test is deleted we still need to treat this differently
             self.addCaveats(flat_reason)
             if 'deleted' in reasons.keys():
-                self.setStatus(self.deleted)
+                if options.extra_info:
+                    self.setStatus(self.deleted)
+                else:
+                    self.setStatus(self.silent)
             else:
                 self.setStatus(self.skip)
             return False

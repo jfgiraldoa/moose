@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MATERIALTESTINDICATOR_H
-#define MATERIALTESTINDICATOR_H
+#pragma once
 
 // MOOSE includes
 #include "Indicator.h"
@@ -38,10 +37,9 @@ protected:
   const MaterialProperty<Real> & _property;
 
   /// The current quadrature rule
-  QBase *& _qrule;
+  const QBase * const & _qrule;
 
   /// The variable for storing indicator value
   MooseVariable & _indicator_var;
 };
 
-#endif // MATERIALTESTINDICATOR_H

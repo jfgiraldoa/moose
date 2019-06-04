@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ADMATERIAL_H
-#define ADMATERIAL_H
+#pragma once
 
 #include "Material.h"
 #include "MooseTypes.h"
@@ -17,6 +16,7 @@
 #include "metaphysicl/dualnumber.h"
 
 #define usingMaterialMembers                                                                       \
+  usingMooseObjectMembers;                                                                         \
   usingCoupleableMembers;                                                                          \
   usingTransientInterfaceMembers;                                                                  \
   usingBlockRestrictableMembers;                                                                   \
@@ -32,8 +32,7 @@
   using ADMaterial<compute_stage>::_fe_problem;                                                    \
   using ADMaterial<compute_stage>::_assembly;                                                      \
   using ADMaterial<compute_stage>::_mesh;                                                          \
-  using ADMaterial<compute_stage>::isParamValid;                                                   \
-  using ADMaterial<compute_stage>::paramError;                                                     \
+  using ADMaterial<compute_stage>::isBoundaryMaterial;                                             \
   using ADMaterial<compute_stage>::copyDualNumbersToValues;                                        \
   using ADMaterial<compute_stage>::_displacements
 
@@ -69,4 +68,3 @@ ADMaterial<compute_stage>::declareADProperty(const std::string & prop_name)
   return _material_data->declareADProperty<T>(prop_name);
 }
 
-#endif // ADMATERIAL_H

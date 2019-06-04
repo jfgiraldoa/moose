@@ -7,11 +7,10 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MULTIAPPINTERPOLATIONTRANSFER_H
-#define MULTIAPPINTERPOLATIONTRANSFER_H
+#pragma once
 
 // MOOSE includes
-#include "MultiAppTransfer.h"
+#include "MultiAppFieldTransfer.h"
 
 #include "libmesh/mesh_base.h"
 
@@ -24,12 +23,10 @@ InputParameters validParams<MultiAppInterpolationTransfer>();
 /**
  * Copy the value to the target domain from the nearest node in the source domain.
  */
-class MultiAppInterpolationTransfer : public MultiAppTransfer
+class MultiAppInterpolationTransfer : public MultiAppFieldTransfer
 {
 public:
   MultiAppInterpolationTransfer(const InputParameters & parameters);
-
-  virtual void initialSetup() override;
 
   virtual void execute() override;
 
@@ -47,13 +44,9 @@ protected:
                         const MeshBase::const_node_iterator & nodes_begin,
                         const MeshBase::const_node_iterator & nodes_end);
 
-  AuxVariableName _to_var_name;
-  VariableName _from_var_name;
-
   unsigned int _num_points;
   Real _power;
   MooseEnum _interp_type;
   Real _radius;
 };
 
-#endif /* MULTIAPPINTERPOLATIONTRANSFER_H */

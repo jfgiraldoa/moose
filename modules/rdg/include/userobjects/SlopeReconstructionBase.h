@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef SLOPERECONSTRUCTIONBASE_H
-#define SLOPERECONSTRUCTIONBASE_H
+#pragma once
 
 #include "BCUserObject.h"
 #include "ElementLoopUserObject.h"
@@ -99,18 +98,18 @@ protected:
 
   /// required data for face assembly
   const MooseArray<Point> & _q_point_face;
-  QBase *& _qrule_face;
+  const QBase * const & _qrule_face;
   const MooseArray<Real> & _JxW_face;
   const MooseArray<Point> & _normals_face;
 
   /// current side of the current element
-  unsigned int & _side;
+  const unsigned int & _side;
 
-  const Elem *& _side_elem;
+  const Elem * const & _side_elem;
   const Real & _side_volume;
 
   /// the neighboring element
-  const Elem *& _neighbor_elem;
+  const Elem * const & _neighbor_elem;
 
   /// flag to indicated if side geometry info is cached
   bool _side_geoinfo_cached;
@@ -118,5 +117,3 @@ protected:
 private:
   static Threads::spin_mutex _mutex;
 };
-
-#endif

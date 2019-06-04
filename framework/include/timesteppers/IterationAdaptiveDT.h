@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ITERATIONADAPTIVEDT_H
-#define ITERATIONADAPTIVEDT_H
+#pragma once
 
 #include "TimeStepper.h"
 #include "LinearInterpolation.h"
@@ -73,8 +72,8 @@ protected:
   /// if specified, the postprocessor value is an upper limit for the time step length
   const PostprocessorValue * _pps_value;
 
-  Function * _timestep_limiting_function;
-  PiecewiseBase * _piecewise_timestep_limiting_function;
+  const Function * _timestep_limiting_function;
+  const PiecewiseBase * _piecewise_timestep_limiting_function;
   /// time point defined in the piecewise function
   std::vector<Real> _times;
 
@@ -110,5 +109,3 @@ protected:
 
 template <>
 InputParameters validParams<IterationAdaptiveDT>();
-
-#endif /* ITERATIONADAPTIVEDT_H */

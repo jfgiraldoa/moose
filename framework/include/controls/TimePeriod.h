@@ -7,15 +7,13 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef TIMEPERIOD_H
-#define TIMEPERIOD_H
+#pragma once
 
 // MOOSE includes
-#include "Control.h"
+#include "ConditionalEnableControl.h"
 
 // Forward declarations
 class TimePeriod;
-class Function;
 
 template <>
 InputParameters validParams<TimePeriod>();
@@ -23,7 +21,7 @@ InputParameters validParams<TimePeriod>();
 /**
  * A basic control for disabling objects for a portion of the simulation.
  */
-class TimePeriod : public Control
+class TimePeriod : public ConditionalEnableControl
 {
 public:
   /**
@@ -32,29 +30,19 @@ public:
    */
   TimePeriod(const InputParameters & parameters);
 
-  virtual void execute() override;
-
 protected:
   /**
    * If enabled, this injects the start/end times into the TimeStepper sync times.
    */
   void initialSetup() override;
 
+  virtual bool conditionMet(const unsigned int & i) override;
+
 private:
-  /// List of objects to enable
-  const std::vector<std::string> & _enable;
-
-  /// List of objects to disable
-  const std::vector<std::string> & _disable;
-
   /// The time to begin enabling the supplied object tags (defaults to the simulation start time)
   std::vector<Real> _start_time;
 
   /// The time to stop enabling the supplied object tags (defaults to the end of the simulation)
   std::vector<Real> _end_time;
-
-  /// Flag for setting value outside of time range
-  bool _set_outside_of_range;
 };
 
-#endif // TIMEPERIOD_H

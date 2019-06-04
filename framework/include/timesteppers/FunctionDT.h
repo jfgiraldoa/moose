@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef FUNCTIONDT_H
-#define FUNCTIONDT_H
+#pragma once
 
 #include "TimeStepper.h"
 #include "FunctionInterface.h"
@@ -43,7 +42,7 @@ protected:
   bool _use_function;
   /// The time-dependent function specifying the time step size (turn this into a reference then
   /// `time_t` and `time_dt` is removed)
-  Function * _function;
+  const Function * _function;
 
   /// Piecewise linear definition of time stepping
   std::unique_ptr<LinearInterpolation> _time_ipol;
@@ -58,5 +57,3 @@ protected:
 
   std::vector<Real> _time_knots;
 };
-
-#endif /* FUNCTIONDT_H */

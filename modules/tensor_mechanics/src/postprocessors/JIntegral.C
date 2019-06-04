@@ -142,7 +142,7 @@ JIntegral::computeIntegral()
                  Utility::string_to_enum<FEFamily>("lagrange"));
   const unsigned int dim = _current_elem->dim();
   std::unique_ptr<FEBase> fe(FEBase::build(dim, fe_type));
-  fe->attach_quadrature_rule(_qrule);
+  fe->attach_quadrature_rule(const_cast<QBase *>(_qrule));
   _phi_curr_elem = &fe->get_phi();
   _dphi_curr_elem = &fe->get_dphi();
   fe->reinit(_current_elem);
@@ -153,7 +153,7 @@ JIntegral::computeIntegral()
 
   for (unsigned int i = 0; i < _current_elem->n_nodes(); ++i)
   {
-    Node * this_node = _current_elem->get_node(i);
+    const Node * this_node = _current_elem->node_ptr(i);
     Real q_this_node;
 
     if (_q_function_type == "GEOMETRY")

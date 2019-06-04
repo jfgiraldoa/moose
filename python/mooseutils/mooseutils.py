@@ -132,7 +132,7 @@ def find_moose_executable(loc, **kwargs):
         print('ERROR: Unable to locate a valid MOOSE executable in directory:', loc)
     return exe
 
-def find_moose_executable_recursive(loc, **kwargs):
+def find_moose_executable_recursive(loc=os.getcwd(), **kwargs):
     """
     Locate a moose executable in the current directory or any parent directory.
 
@@ -146,12 +146,15 @@ def find_moose_executable_recursive(loc, **kwargs):
             break
     return executable
 
-def run_executable(app_path, args, suppress_output=False):
+def run_executable(app_path, args, mpi=None, suppress_output=False):
     """
     A function for running an application.
     """
     import subprocess
-    cmd = [app_path]
+    if mpi and isinstance(mpi, int):
+        cmd = ['mpiexec', '-n', str(mpi), app_path]
+    else:
+        cmd = [app_path]
     cmd += args
 
     if suppress_output:
@@ -248,36 +251,6 @@ def make_chunks(local, num=multiprocessing.cpu_count()):
     """
     k, m = divmod(len(local), num)
     return (local[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in xrange(num))
-
-def check_file_size(base=os.getcwd(), size=1, ignore=None):
-    """
-    Check the supplied directory for files greater then a prescribed size.
-
-    Input:
-        base[str]: The root directory to recursively search
-        size[int]: The size in MiB to check against
-        ignore[pattern]: A glob pattern to ignore
-    """
-
-    # Define the size in bytes
-    size = size * 1024.**2
-
-    # Define ignore sets
-    if ignore is None:
-        ignore = set()
-
-    # Search for files that are too large
-    FileInfo = collections.namedtuple('FileInfo', 'name size')
-    output = []
-    for root, _, files in os.walk(base, topdown=False):
-        for name in files:
-            filename = os.path.join(root, name)
-            if filename in ignore:
-                continue
-            result = os.stat(filename)
-            if result.st_size > size:
-                output.append(FileInfo(name=filename, size=result.st_size/(1024.**2)))
-    return output
 
 def camel_to_space(text):
     """

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef INSADMATERIAL_H
-#define INSADMATERIAL_H
+#pragma once
 
 #include "ADMaterial.h"
 
@@ -87,15 +86,13 @@ protected:
   ADMaterialProperty(RealVectorValue) & _momentum_strong_residual;
 
   /// The x velocity mms forcing function
-  Function & _x_vel_fn;
+  const Function & _x_vel_fn;
 
   /// The y velocity mms forcing function
-  Function & _y_vel_fn;
+  const Function & _y_vel_fn;
 
   /// The z velocity mms forcing function
-  Function & _z_vel_fn;
+  const Function & _z_vel_fn;
 
   usingMaterialMembers;
 };
-
-#endif // INSADMATERIAL_H

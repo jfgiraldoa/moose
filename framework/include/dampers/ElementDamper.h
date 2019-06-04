@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ELEMENTDAMPER_H
-#define ELEMENTDAMPER_H
+#pragma once
 
 // Moose Includes
 #include "Damper.h"
@@ -65,23 +64,22 @@ protected:
   MooseVariable & _var;
 
   /// Current element
-  const Elem *& _current_elem;
+  const Elem * const & _current_elem;
 
   /// Quadrature point index
   unsigned int _qp;
   /// Quadrature points
   const MooseArray<Point> & _q_point;
   /// Quadrature rule
-  QBase *& _qrule;
+  const QBase * const & _qrule;
   /// Transformed Jacobian weights
   const MooseArray<Real> & _JxW;
 
   /// The current Newton increment
-  VariableValue & _u_increment;
+  const VariableValue & _u_increment;
   /// Holds the current solution at the current quadrature point
   const VariableValue & _u;
   /// Holds the current solution gradient at the current quadrature point
   const VariableGradient & _grad_u;
 };
 
-#endif // ELEMENTDAMPER_H

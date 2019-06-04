@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MOOSEPARSEDVECTORFUNCTION_H
-#define MOOSEPARSEDVECTORFUNCTION_H
+#pragma once
 
 // MOOSE includes
 #include "Function.h"
@@ -33,11 +32,11 @@ public:
    */
   MooseParsedVectorFunction(const InputParameters & parameters);
 
-  virtual RealVectorValue vectorValue(Real t, const Point & p) override;
+  virtual RealVectorValue vectorValue(Real t, const Point & p) const override;
 
-  virtual RealVectorValue vectorCurl(Real t, const Point & p) override;
+  virtual RealVectorValue vectorCurl(Real t, const Point & p) const override;
 
-  virtual RealGradient gradient(Real t, const Point & p) override;
+  virtual RealGradient gradient(Real t, const Point & p) const override;
 
   virtual void initialSetup() override;
 
@@ -51,5 +50,3 @@ protected:
   /// Pointer to the Parsed function wrapper object for the curl
   std::unique_ptr<MooseParsedFunctionWrapper> _curl_function_ptr;
 };
-
-#endif // MOOSEPARSEDVECTORFUNCTION_H

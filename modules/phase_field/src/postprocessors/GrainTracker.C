@@ -52,8 +52,11 @@ validParams<GrainTracker>()
   InputParameters params = validParams<FeatureFloodCount>();
   params += validParams<GrainTrackerInterface>();
 
+  // FeatureFloodCount adds a relationship manager, but we need to extend that for GrainTracker
+  params.clearRelationshipManagers();
+
   params.addRelationshipManager(
-      "ElementPointNeighborLayers",
+      "ElementSideNeighborLayers",
       Moose::RelationshipManagerType::GEOMETRIC,
 
       [](const InputParameters & obj_params, InputParameters & rm_params) {
@@ -62,7 +65,7 @@ validParams<GrainTracker>()
 
   );
 
-  params.addRelationshipManager("ElementPointNeighborLayers",
+  params.addRelationshipManager("ElementSideNeighborLayers",
                                 Moose::RelationshipManagerType::ALGEBRAIC);
 
   // The GrainTracker requires non-volatile storage for tracking grains across invocations.
@@ -1432,7 +1435,7 @@ GrainTracker::swapSolutionValues(FeatureData & grain,
 
       for (unsigned int i = 0; i < elem->n_nodes(); ++i)
       {
-        Node * curr_node = elem->get_node(i);
+        Node * curr_node = elem->node_ptr(i);
         if (updated_nodes_tmp.find(curr_node) == updated_nodes_tmp.end())
         {
           // cache this node so we don't attempt to remap it again within this loop

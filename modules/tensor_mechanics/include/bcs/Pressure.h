@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PRESSURE_H
-#define PRESSURE_H
+#pragma once
 
 #include "IntegratedBC.h"
 
@@ -33,12 +32,10 @@ protected:
 
   const Real _factor;
 
-  Function * const _function;
+  const Function * const _function;
 
   const PostprocessorValue * const _postprocessor;
 
   /// _alpha Parameter for HHT time integration scheme
   const Real _alpha;
 };
-
-#endif // PRESSURE_H

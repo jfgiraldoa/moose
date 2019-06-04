@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ADPOWERLAWCREEPSTRESSUPDATE_H
-#define ADPOWERLAWCREEPSTRESSUPDATE_H
+#pragma once
 
 #include "ADRadialReturnCreepStressUpdateBase.h"
 
@@ -41,11 +40,8 @@ protected:
   virtual ADReal computeDerivative(const ADReal & effective_trial_stress,
                                    const ADReal & scalar) override;
 
-  /// Flag to determine if temperature is supplied by the user
-  const bool _has_temp;
-
   /// Temperature variable value
-  const VariableValue & _temperature;
+  const ADVariableValue * _temperature;
 
   /// Leading coefficient
   const Real _coefficient;
@@ -69,9 +65,7 @@ protected:
   ADReal _exponential;
 
   /// Exponential calculated from current time
-  ADReal _exp_time;
+  Real _exp_time;
 
   usingRadialReturnCreepStressUpdateBaseMembers;
 };
-
-#endif // ADPOWERLAWCREEPSTRESSUPDATE_H

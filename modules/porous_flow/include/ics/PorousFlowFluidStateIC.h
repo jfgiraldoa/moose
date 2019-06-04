@@ -7,14 +7,13 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef POROUSFLOWFLUIDSTATEIC_H
-#define POROUSFLOWFLUIDSTATEIC_H
+#pragma once
 
 #include "InitialCondition.h"
 
 class PorousFlowDictator;
 class PorousFlowFluidStateIC;
-class PorousFlowFluidStateBase;
+class PorousFlowFluidStateMultiComponentBase;
 
 template <>
 InputParameters validParams<PorousFlowFluidStateIC>();
@@ -45,7 +44,6 @@ protected:
   /// The PorousFlowDictator UserObject
   const PorousFlowDictator & _dictator;
   /// FluidState UserObject
-  const PorousFlowFluidStateBase & _fs;
+  const PorousFlowFluidStateMultiComponentBase & _fs;
 };
 
-#endif // POROUSFLOWFLUIDSTATEIC_H

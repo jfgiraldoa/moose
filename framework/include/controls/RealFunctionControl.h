@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef REALFUNCTIONCONTROL_H
-#define REALFUNCTIONCONTROL_H
+#pragma once
 
 // MOOSE includes
 #include "Control.h"
@@ -36,7 +35,5 @@ public:
 
 private:
   /// The function to execute
-  Function & _function;
+  const Function & _function;
 };
-
-#endif // REALFUNCTIONCONTROL_H

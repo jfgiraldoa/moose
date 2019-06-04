@@ -7,11 +7,10 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MULTIAPPNEARESTNODETRANSFER_H
-#define MULTIAPPNEARESTNODETRANSFER_H
+#pragma once
 
 // MOOSE includes
-#include "MultiAppTransfer.h"
+#include "MultiAppFieldTransfer.h"
 
 // Forward declarations
 class MultiAppNearestNodeTransfer;
@@ -26,12 +25,10 @@ InputParameters validParams<MultiAppNearestNodeTransfer>();
 /**
  * Copy the value to the target domain from the nearest node in the source domain.
  */
-class MultiAppNearestNodeTransfer : public MultiAppTransfer
+class MultiAppNearestNodeTransfer : public MultiAppFieldTransfer
 {
 public:
   MultiAppNearestNodeTransfer(const InputParameters & parameters);
-
-  virtual void initialSetup() override;
 
   virtual void execute() override;
 
@@ -70,9 +67,6 @@ protected:
                         std::vector<std::pair<Point, DofObject *>> & local_entities,
                         bool nodal);
 
-  AuxVariableName _to_var_name;
-  VariableName _from_var_name;
-
   /// If true then node connections will be cached
   bool _fixed_meshes;
 
@@ -90,4 +84,3 @@ protected:
   std::map<dof_id_type, unsigned int> & _cached_qp_inds;
 };
 
-#endif /* MULTIAPPNEARESTNODETRANSFER_H */

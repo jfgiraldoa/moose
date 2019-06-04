@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef CONSTANTFUNCTION_H
-#define CONSTANTFUNCTION_H
+#pragma once
 
 #include "Function.h"
 
@@ -25,10 +24,8 @@ class ConstantFunction : public Function
 public:
   ConstantFunction(const InputParameters & parameters);
 
-  virtual Real value(Real t, const Point & p) override;
+  virtual Real value(Real t, const Point & p) const override;
 
 protected:
   const Real & _value;
 };
-
-#endif

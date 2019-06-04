@@ -6,8 +6,8 @@
 //*
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
-#ifndef STOCHASTIC_TOOLSAPP_H
-#define STOCHASTIC_TOOLSAPP_H
+
+#pragma once
 
 #include "MooseApp.h"
 
@@ -29,4 +29,13 @@ public:
   static void registerExecFlags(Factory & factory);
 };
 
-#endif /* STOCHASTIC_TOOLSAPP_H */
+/// Enum for batch type in stochastic tools MultiApp
+namespace StochasticTools
+{
+enum class MultiAppMode
+{
+  NORMAL = 0,
+  BATCH_RESET = 1,
+  BATCH_RESTORE = 2
+};
+}

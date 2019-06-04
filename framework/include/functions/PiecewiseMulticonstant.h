@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PIECEWISEMULTICONSTANT_H
-#define PIECEWISEMULTICONSTANT_H
+#pragma once
 
 #include "PiecewiseMultiInterpolation.h"
 
@@ -33,11 +32,9 @@ public:
   PiecewiseMulticonstant(const InputParameters & parameters);
 
 protected:
-  virtual Real sample(const std::vector<Real> & pt) override;
+  virtual Real sample(const std::vector<Real> & pt) const override;
 
 private:
   /// direction where to look for value if interpolation order is constant
   MultiMooseEnum _direction;
 };
-
-#endif // PiecewiseMulticonstant_H

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef NEARESTNODEVALUEAUX_H
-#define NEARESTNODEVALUEAUX_H
+#pragma once
 
 #include "AuxKernel.h"
 
@@ -33,9 +32,8 @@ protected:
 
   NearestNodeLocator & _nearest_node;
 
-  const NumericVector<Number> *& _serialized_solution;
+  const NumericVector<Number> * const & _serialized_solution;
 
   unsigned int _paired_variable;
 };
 
-#endif // NEARESTNODEVALUEAUX_H

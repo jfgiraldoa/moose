@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef COMPUTEINSTANTANEOUSTHERMALEXPANSIONFUNCTIONEIGENSTRAIN_H
-#define COMPUTEINSTANTANEOUSTHERMALEXPANSIONFUNCTIONEIGENSTRAIN_H
+#pragma once
 
 #include "ComputeThermalExpansionEigenstrainBase.h"
 #include "DerivativeMaterialInterface.h"
@@ -33,7 +32,7 @@ protected:
   virtual void computeThermalStrain(Real & thermal_strain, Real & instantaneous_cte) override;
 
   const VariableValue & _temperature_old;
-  Function & _thermal_expansion_function;
+  const Function & _thermal_expansion_function;
 
   /// Stores the thermal strain as a scalar for use in computing an incremental update to this.
   //@{
@@ -44,5 +43,3 @@ protected:
   /// Indicates whether we are on the first step, avoiding false positives when restarting
   bool & _step_one;
 };
-
-#endif // COMPUTEINSTANTANEOUSTHERMALEXPANSIONFUNCTIONEIGENSTRAIN_H

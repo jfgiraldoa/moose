@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef THEWAREHOUSE_H
-#define THEWAREHOUSE_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -18,6 +17,7 @@
 #include <mutex>
 
 #include "MooseObject.h"
+#include "MooseHashing.h"
 
 class MooseObject;
 class Storage;
@@ -77,33 +77,6 @@ private:
 /// important even though you don't see it being called (directly) anywhere - it *IS* being used.
 bool operator==(const std::unique_ptr<Attribute> & lhs, const std::unique_ptr<Attribute> & rhs);
 
-/// Used for hash function specialization for Attribute objects.
-inline void
-hash_combine(std::size_t & /*seed*/)
-{
-}
-
-/// Used to combine an existing hash value with the hash of one or more other values (v and rest).
-/// For example "auto h = std::hash("hello"); hash_combine(h, my_int_val, my_float_val, etc.);"
-template <typename T, typename... Rest>
-inline void
-hash_combine(std::size_t & seed, const T & v, Rest &&... rest)
-{
-  std::hash<T> hasher;
-  seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-  hash_combine(seed, std::forward<Rest>(rest)...);
-}
-
-/// Used for hash function specialization for Attribute objects.
-template <typename T, typename... Rest>
-inline void
-hash_combine(std::size_t & seed, const std::vector<T> & v, Rest &&... rest)
-{
-  for (auto & val : v)
-    hash_combine(seed, val);
-  hash_combine(seed, std::forward<Rest>(rest)...);
-}
-
 namespace std
 {
 /// This template specialization allows Attributes to be used as unordered map key.
@@ -114,7 +87,7 @@ public:
   size_t operator()(const Attribute & attrib) const
   {
     size_t h = attrib.hash();
-    hash_combine(h, attrib.id());
+    Moose::hash_combine(h, attrib.id());
     return h;
   }
 };
@@ -128,7 +101,7 @@ public:
   {
     size_t h = 0;
     for (auto & attrib : attribs)
-      hash_combine(h, *attrib);
+      Moose::hash_combine(h, *attrib);
     return h;
   }
 };
@@ -331,4 +304,3 @@ private:
   std::mutex _obj_cache_mutex;
 };
 
-#endif // THEWAREHOUSE_H

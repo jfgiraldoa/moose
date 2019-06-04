@@ -1,11 +1,13 @@
-/****************************************************************/
-/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
-/*                                                              */
-/*          All contents are licensed under LGPL V2.1           */
-/*             See LICENSE for full restrictions                */
-/****************************************************************/
-#ifndef INERTIALFORCEBEAM_H
-#define INERTIALFORCEBEAM_H
+//* This file is part of the MOOSE framework
+//* https://www.mooseframework.org
+//*
+//* All rights reserved, see COPYRIGHT for full restrictions
+//* https://github.com/idaholab/moose/blob/master/COPYRIGHT
+//*
+//* Licensed under LGPL 2.1, please see LICENSE for details
+//* https://www.gnu.org/licenses/lgpl-2.1.html
+
+#pragma once
 
 #include "TimeKernel.h"
 #include "Material.h"
@@ -33,6 +35,15 @@ protected:
   virtual Real computeQpResidual() override { return 0.0; };
 
 private:
+  /// Booleans for validity of params
+  const bool _has_beta;
+  const bool _has_gamma;
+  const bool _has_velocities;
+  const bool _has_rot_velocities;
+  const bool _has_accelerations;
+  const bool _has_rot_accelerations;
+  const bool _has_Ix;
+
   /// Density of the beam
   const MaterialProperty<Real> & _density;
 
@@ -176,4 +187,3 @@ private:
   const VariableValue * _du_dotdot_du;
 };
 
-#endif // INERTIALFORCEBEAM_H

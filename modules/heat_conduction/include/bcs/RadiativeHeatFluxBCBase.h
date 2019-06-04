@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef RADIATIVEHEATFLUXBCBASE_H
-#define RADIATIVEHEATFLUXBCBASE_H
+#pragma once
 
 #include "IntegratedBC.h"
 
@@ -43,10 +42,8 @@ protected:
   const Real _sigma_stefan_boltzmann;
 
   /// Function describing the temperature of the body irhs
-  Function & _tinf;
+  const Function & _tinf;
 
   /// Emissivity of the boundary
   const Real _eps_boundary;
 };
-
-#endif // RADIATIVEHEATFLUXBCBASE_H

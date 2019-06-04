@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef FUNCTIONPERIODICBOUNDARY_H
-#define FUNCTIONPERIODICBOUNDARY_H
+#pragma once
 
 #include "Moose.h"
 
@@ -57,18 +56,16 @@ protected:
   unsigned int _dim;
 
   /// Pointer to Function for x-component of the boundary
-  Function * _tr_x;
+  const Function * _tr_x;
 
   /// Pointer to Function for y-component of the boundary
-  Function * _tr_y;
+  const Function * _tr_y;
 
   /// Pointer to Function for z-component of the boundary
-  Function * _tr_z;
+  const Function * _tr_z;
 
   /**
    * An initialization method to make certain that initialSetup() of a function prior to value()
    */
   void init();
 };
-
-#endif // FUNCTIONPERIODICBOUNDARY_H

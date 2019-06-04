@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MTPIECEWISECONST1D_H
-#define MTPIECEWISECONST1D_H
+#pragma once
 
 #include "Function.h"
 
@@ -22,7 +21,5 @@ class MTPiecewiseConst1D : public Function
 public:
   MTPiecewiseConst1D(const InputParameters & parameters);
 
-  virtual Real value(Real t, const Point & p);
+  virtual Real value(Real t, const Point & p) const;
 };
-
-#endif // MTPIECEWISECONST1D_H

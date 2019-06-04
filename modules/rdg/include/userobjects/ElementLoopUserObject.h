@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ELEMENTLOOPUSEROBJECT_H
-#define ELEMENTLOOPUSEROBJECT_H
+#pragma once
 
 #include "GeneralUserObject.h"
 #include "Coupleable.h"
@@ -71,6 +70,7 @@ public:
   virtual void finalize();
 
   virtual void pre();
+  virtual void preElement(const Elem * elem);
   virtual void onElement(const Elem * elem);
   virtual void onBoundary(const Elem * elem, unsigned int side, BoundaryID bnd_id);
   virtual void onInternalSide(const Elem * elem, unsigned int side);
@@ -94,7 +94,7 @@ protected:
   const Elem * _current_neighbor;
 
   const MooseArray<Point> & _q_point;
-  QBase *& _qrule;
+  const QBase * const & _qrule;
   const MooseArray<Real> & _JxW;
   const MooseArray<Real> & _coord;
 
@@ -114,5 +114,3 @@ protected:
   virtual void computeInternalSide();
   virtual void computeInterface();
 };
-
-#endif

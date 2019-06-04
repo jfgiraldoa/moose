@@ -76,6 +76,7 @@ temp_print_trace.*
 *.tiff
 *.ps
 *.bmp
+*.ico
 *.html
 *.xyz
 *Revision.h
@@ -200,6 +201,7 @@ python/MooseDocs/test/output
 !python/MooseDocs/test/gold/**/*.json
 !python/MooseDocs/test/gold/**/*.html
 !python/MooseDocs/test/gold/**/*.tex
+.ruby-version
 
 # Chigger
 !python/chigger/tests/**/gold/*.png

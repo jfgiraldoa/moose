@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef POROUSFLOWADVECTIEFLUXCALCULATORBASE_H
-#define POROUSFLOWADVECTIEFLUXCALCULATORBASE_H
+#pragma once
 
 #include "AdvectiveFluxCalculatorBase.h"
 #include "PorousFlowDictator.h"
@@ -72,6 +71,9 @@ protected:
   const std::map<dof_id_type, std::vector<Real>> & getdK_dvar(dof_id_type node_i,
                                                               dof_id_type node_j) const;
 
+  virtual void buildCommLists() override;
+  virtual void exchangeGhostedInfo() override;
+
   /// PorousFlowDictator UserObject
   const PorousFlowDictator & _dictator;
 
@@ -132,6 +134,26 @@ protected:
 
   /// _dflux_out_dvars[sequential_i][global_j][pvar] = d(flux_out[global version of sequential_i])/d(porous_flow_variable pvar at global node j)
   std::vector<std::map<dof_id_type, std::vector<Real>>> _dflux_out_dvars;
-};
 
-#endif // POROUSFLOWADVECTIEFLUXCALCULATORBASE_H
+  /**
+   * _triples_to_receive[proc_id] indicates the dk(i, j)/du_nodal information that we will receive
+   * from proc_id.  _triples_to_receive is first built (in buildCommLists()) using global node IDs,
+   * but after construction, a translation to sequential node IDs and the index of connections is
+   * performed, for efficiency.
+   * The result is that, for i a multiple of 3, we will receive
+   * _dkij_dvar[_triples_to_receive[proc_id][i]][_triples_to_receive[proc_id][i +
+   * 1]][_triples_to_receive[proc_id][i + 2]][:] from processor proc_id
+   */
+  std::map<processor_id_type, std::vector<dof_id_type>> _triples_to_receive;
+
+  /**
+   * _triples_to_send[proc_id] indicates the dk(i, j)/du_nodal information that we will send to
+   * proc_id.  _triples_to_send is first built (in buildCommLists()) using global node IDs, but
+   * after construction, a translation to sequential node IDs and the index of connections is
+   * performed, for efficiency.
+   * The result is that, for i a multiple of 3, we will send
+   * _dkij_dvar[_triples_to_send[proc_id][i]][_triples_to_send[proc_id][i +
+   * 1]][_triples_to_send[proc_id][i + 2]][:] to processor proc_id
+   */
+  std::map<processor_id_type, std::vector<dof_id_type>> _triples_to_send;
+};

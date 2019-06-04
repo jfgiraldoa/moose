@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef INTERNALSIDEINDICATOR_H
-#define INTERNALSIDEINDICATOR_H
+#pragma once
 
 // local includes
 #include "Indicator.h"
@@ -53,20 +52,20 @@ public:
 protected:
   MooseVariable & _field_var;
 
-  const Elem *& _current_elem;
+  const Elem * const & _current_elem;
   /// The neighboring element
-  const Elem *& _neighbor_elem;
+  const Elem * const & _neighbor_elem;
 
   /// Current side
-  unsigned int & _current_side;
+  const unsigned int & _current_side;
   /// Current side element
-  const Elem *& _current_side_elem;
+  const Elem * const & _current_side_elem;
 
   /// Coordinate system
   const Moose::CoordinateSystemType & _coord_sys;
   unsigned int _qp;
   const MooseArray<Point> & _q_point;
-  QBase *& _qrule;
+  const QBase * const & _qrule;
   const MooseArray<Real> & _JxW;
   const MooseArray<Real> & _coord;
 
@@ -105,4 +104,3 @@ public:
   static const BoundaryID InternalBndId;
 };
 
-#endif // INTERNALSIDEINDICATOR_H

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ADKERNEL_H
-#define ADKERNEL_H
+#pragma once
 
 #include "KernelBase.h"
 
@@ -16,6 +15,7 @@
 #include "metaphysicl/dualnumber.h"
 
 #define usingTemplKernelMembers(type)                                                              \
+  usingMooseObjectMembers;                                                                         \
   usingCoupleableMembers;                                                                          \
   usingBlockRestrictableMembers;                                                                   \
   usingFunctionInterfaceMembers;                                                                   \
@@ -51,8 +51,7 @@
   using ADKernelTempl<type, compute_stage>::accumulateTaggedLocalResidual;                         \
   using ADKernelTempl<type, compute_stage>::accumulateTaggedLocalMatrix;                           \
   using ADKernelTempl<type, compute_stage>::variable;                                              \
-  using ADKernelTempl<type, compute_stage>::paramError;                                            \
-  using ADKernelTempl<type, compute_stage>::isParamValid
+  using ADKernelTempl<type, compute_stage>::getPostprocessorValue
 
 #define usingKernelMembers usingTemplKernelMembers(Real)
 #define usingVectorKernelMembers usingTemplKernelMembers(RealVectorValue)
@@ -119,4 +118,3 @@ protected:
   const typename VariablePhiGradientType<T, compute_stage>::type & _grad_phi;
 };
 
-#endif /* ADKERNEL_H */

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PARSEDSUBDOMAINMESHGENERATOR_H
-#define PARSEDSUBDOMAINMESHGENERATOR_H
+#pragma once
 
 #include "MeshGenerator.h"
 #include "FunctionParserUtils.h"
@@ -27,7 +26,7 @@ class ParsedSubdomainMeshGenerator : public MeshGenerator, public FunctionParser
 public:
   ParsedSubdomainMeshGenerator(const InputParameters & parameters);
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   std::unique_ptr<MeshBase> & _input;
@@ -45,4 +44,3 @@ protected:
   ADFunctionPtr _func_F;
 };
 
-#endif // PARSEDSUBDOMAINMESHGENERATOR_H

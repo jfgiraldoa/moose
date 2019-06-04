@@ -1,9 +1,24 @@
-from sympy import *
+#* This file is part of the MOOSE framework
+#* https://www.mooseframework.org
+#*
+#* All rights reserved, see COPYRIGHT for full restrictions
+#* https://github.com/idaholab/moose/blob/master/COPYRIGHT
+#*
+#* Licensed under LGPL 2.1, please see LICENSE for details
+#* https://www.gnu.org/licenses/lgpl-2.1.html
+
+from sympy import * # use star so all functions are available to supplied strings
 from sympy.vector import divergence, gradient, Vector, CoordSys3D
 from fparser import print_fparser
 from moosefunction import print_moose
 
-def evaluate(pde, soln, variable='u', scalars=set(), vectors=set()):
+def evaluate(pde, soln, variable='u',
+             scalars=set(),
+             vectors=set(),
+             functions=set(),
+             vectorfunctions=set(),
+             negative=False,
+             **kwargs):
     """
     Function to evaluate PDEs for the method of manufactured solutions forcing functions.
 
@@ -11,9 +26,17 @@ def evaluate(pde, soln, variable='u', scalars=set(), vectors=set()):
         pde[str]: A string representation of your PDE, eg. 'diff(T,t) + div(grad(T))'
         soln[str]: The desired solution, e.g., 'cos(u*t*x)'
         variable[str]: The solution variable in the PDE (default: 'u')
-        scalars[list]: A list of strings of extra scalar variables, the symbols 'x', 'y', 'z', and
-                       't' are automatically defined
-        vectors
+        scalars[list]: A list of strings of constant scalar variables
+        vectors[list]: A list of strings of extra constant vector variables
+        functions[list]: A list of strings of arbitrary scalar variables that are a function of
+                         x,y,z, and t.
+        vectorfunctions[list]: A list of strings of arbitrary vector variables that are a function
+                               of x,y,z, and t.
+        negative[bool]: If true the negative of the computed function is returned, by default this
+                        is false. Thus, by default the return function may be pasted directly
+                        into the BodyForce Kernel object within MOOSE.
+        kwargs: Variables with known functions that are a function of x,y,z, and t or any other
+                symbol, e.g. "u='cos(x*y)'" or "y='2*y*y*R.i + 5*x*R.j'".
 
     Example:
         import mms
@@ -28,29 +51,91 @@ def evaluate(pde, soln, variable='u', scalars=set(), vectors=set()):
     y = R.y
     z = R.z
     t = Symbol('t')
+    e_i = R.i
+    e_j = R.j
+    e_k = R.k
 
-    for v in vectors:
-        for c in 'xyz':
-            s = '{}_{}'.format(v,c)
-            locals()[s] = Symbol(s)
-        locals()[v] = locals()['{}_x'.format(v)]*R.i + \
-                      locals()['{}_y'.format(v)]*R.j + \
-                      locals()['{}_z'.format(v)]*R.k
+    # Define extra vectors, use _v_ in order to not collide with vector=['v']
+    for _v_ in vectors:
+        _check_reserved(_v_)
+        for _c_ in 'xyz':
+            _s_ = '{}_{}'.format(_v_, _c_)
+            locals()[_s_] = Symbol(_s_)
+        locals()[_v_] = locals()['{}_x'.format(_v_)]*R.i + \
+                        locals()['{}_y'.format(_v_)]*R.j + \
+                        locals()['{}_z'.format(_v_)]*R.k
 
-    # Define extra symbols
-    for s in scalars:
-        locals()[s] = Symbol(s)
+    # Define extra scalars
+    for _s_ in scalars:
+        _check_reserved(_s_)
+        locals()[_s_] = Symbol(_s_)
 
-    # Evaluate the solution
-    locals()[variable] = eval(soln)
+    # Define extra functions
+    for _f_ in functions:
+        _check_reserved(_f_)
+        locals()[_f_] = Function(_f_)(x, y, z, t)
+
+    # Define extra vector functions
+    for _vf_ in vectorfunctions:
+        _check_reserved(_vf_)
+        for _c_ in 'xyz':
+            _s_ = '{}_{}'.format(_vf_, _c_)
+            locals()[_s_] = Function(_s_)(x, y, z, t)
+        locals()[_vf_] = locals()['{}_x'.format(_vf_)]*R.i + \
+                         locals()['{}_y'.format(_vf_)]*R.j + \
+                         locals()['{}_z'.format(_vf_)]*R.k
+
+    # Define known functions
+    for _f_, _v_ in kwargs.iteritems():
+        _check_reserved(_f_)
+        locals()[_f_] = eval(_v_)
+        if isinstance(locals()[_f_], Vector):
+            locals()['{}_x'.format(_f_)] = locals()[_f_].components.get(R.i, 0)
+            locals()['{}_y'.format(_f_)] = locals()[_f_].components.get(R.j, 0)
+            locals()['{}_z'.format(_f_)] = locals()[_f_].components.get(R.k, 0)
+
+    # Evaluate the supplied solution
+    _exact_ = eval(soln)
+    locals()[variable] = _exact_
 
     # Evaluate the PDE
     pde = pde.replace('grad', 'gradient')
     pde = pde.replace('div', 'divergence')
-    return eval(pde), locals()[variable]
+    _func_ = eval(pde)
+    if negative:
+        _func_ = -1 * _func_
+
+    # Convert vector exact solution to a list
+    if isinstance(_exact_, Vector):
+        _exact_ = [_exact_.components.get(R.i, 0),
+                   _exact_.components.get(R.j, 0),
+                   _exact_.components.get(R.k, 0)]
+
+    # Convert vector result to a list
+    if isinstance(_func_, Vector):
+        _func_ = [_func_.components.get(R.i, 0),
+                  _func_.components.get(R.j, 0),
+                  _func_.components.get(R.k, 0)]
+
+    return _func_, _exact_
+
+def _check_reserved(var):
+    """Error checking for input variables."""
+    if var == 'R':
+        raise SyntaxError("The variable name 'R' is reserved, it represents the coordinate system," \
+                          " see sympy.vector.CoordSys3D.")
+
+    elif var in ['x', 'y', 'z']:
+        msg = "The variable name '{0}' is reserved, it represents the {0} spatial direction " \
+              "(R.{0}) for the 'R' coordinate system as defined by a sympy.vector.CoordSys3D."
+        raise SyntaxError(msg.format(var))
+
+    elif var == 't':
+        raise SyntaxError("The variable name 't' is reserved, it represents time.")
 
 
-if __name__ == '__main__':
-    f = evaluate('diff(h, t) + div(u*h)', 'cos(x*y*t)', variable='h', vectors='u')
-    #print_moose(f)
-    print_fparser(f)
+    elif var in ['e_i', 'e_j', 'e_k']:
+        basis = dict(e_i='x', e_j='y', e_k='z')
+        msg = "The variable name '{0}' is reserved, it represents the {1} basis vector " \
+              "(R.{0}) for the 'R' coordinate system as defined by a sympy.vector.CoordSys3D."
+        raise SyntaxError(msg.format(var, basis[var]))

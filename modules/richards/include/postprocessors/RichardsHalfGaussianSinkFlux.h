@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef RICHARDSHALFGAUSSIANSINKFLUX_H
-#define RICHARDSHALFGAUSSIANSINKFLUX_H
+#pragma once
 
 #include "SideIntegralVariablePostprocessor.h"
 #include "RichardsVarNames.h"
@@ -63,10 +62,8 @@ protected:
   unsigned int _pvar;
 
   /// the multiplier function
-  Function & _m_func;
+  const Function & _m_func;
 
   /// porepressure (or porepressure vector for multiphase problems)
   const MaterialProperty<std::vector<Real>> & _pp;
 };
-
-#endif

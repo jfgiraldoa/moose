@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ELEMENTDELETIONGENERATORBASE_H
-#define ELEMENTDELETIONGENERATORBASE_H
+#pragma once
 
 #include "MeshGenerator.h"
 
@@ -30,7 +29,7 @@ class ElementDeletionGeneratorBase : public MeshGenerator
 public:
   ElementDeletionGeneratorBase(const InputParameters & parameters);
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   std::unique_ptr<MeshBase> & _input;
@@ -48,4 +47,3 @@ protected:
   const BoundaryName _boundary_name;
 };
 
-#endif // ELEMENTDELETIONGENERATORBASE_H

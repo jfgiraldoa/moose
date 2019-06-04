@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef BODYFORCE_H
-#define BODYFORCE_H
+#pragma once
 
 #include "Kernel.h"
 
@@ -39,10 +38,8 @@ protected:
   const Real & _scale;
 
   /// Optional function value
-  Function & _function;
+  const Function & _function;
 
   /// Optional Postprocessor value
   const PostprocessorValue & _postprocessor;
 };
-
-#endif

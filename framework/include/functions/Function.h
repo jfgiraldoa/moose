@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef FUNCTION_H
-#define FUNCTION_H
+#pragma once
 
 #include "MooseObject.h"
 #include "SetupInterface.h"
@@ -66,7 +65,7 @@ public:
    * \param p The Point in space (x,y,z)
    * \return A scalar of the function evaluated at the time and location
    */
-  virtual Real value(Real t, const Point & p);
+  virtual Real value(Real t, const Point & p) const;
 
   /**
    * Override this to evaluate the vector function at a point (t,x,y,z), by default
@@ -75,7 +74,7 @@ public:
    * \param p The Point in space (x,y,z)
    * \return A vector of the function evaluated at the time and location
    */
-  virtual RealVectorValue vectorValue(Real t, const Point & p);
+  virtual RealVectorValue vectorValue(Real t, const Point & p) const;
 
   /**
    * Override this to evaluate the curl of the vector function at a point (t,x,y,z),
@@ -84,7 +83,7 @@ public:
    * \param p The Point in space (x,y,z)
    * \return A vector of the curl of the function evaluated at the time and location
    */
-  virtual RealVectorValue vectorCurl(Real t, const Point & p);
+  virtual RealVectorValue vectorCurl(Real t, const Point & p) const;
 
   /**
    * Function objects can optionally provide a gradient at a point. By default
@@ -93,7 +92,7 @@ public:
    * \param p The Point in space (x,y,z)
    * \return A gradient of the function evaluated at the time and location
    */
-  virtual RealGradient gradient(Real t, const Point & p);
+  virtual RealGradient gradient(Real t, const Point & p) const;
 
   /**
    * Get the time derivative of the function
@@ -101,13 +100,11 @@ public:
    * \param p The point in space (x,y,z)
    * \return The time derivative of the function at the specified time and location
    */
-  virtual Real timeDerivative(Real t, const Point & p);
+  virtual Real timeDerivative(Real t, const Point & p) const;
 
   // Not defined
-  virtual Real integral();
+  virtual Real integral() const;
 
   // Not defined
-  virtual Real average();
+  virtual Real average() const;
 };
-
-#endif // FUNCTION_H

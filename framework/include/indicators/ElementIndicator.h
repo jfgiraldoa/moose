@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ELEMENTINDICATOR_H
-#define ELEMENTINDICATOR_H
+#pragma once
 
 #include "Indicator.h"
 #include "TransientInterface.h"
@@ -41,13 +40,13 @@ public:
 protected:
   MooseVariable & _field_var;
 
-  const Elem *& _current_elem;
+  const Elem * const & _current_elem;
   /// Volume of the current element
   const Real & _current_elem_volume;
 
   unsigned int _qp;
   const MooseArray<Point> & _q_point;
-  QBase *& _qrule;
+  const QBase * const & _qrule;
   const MooseArray<Real> & _JxW;
   const MooseArray<Real> & _coord;
 
@@ -63,4 +62,3 @@ protected:
   DenseVector<Number> _local_indtr;
 };
 
-#endif /* ELEMENTINDICATOR_H */

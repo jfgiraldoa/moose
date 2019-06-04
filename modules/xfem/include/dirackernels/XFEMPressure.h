@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef XFEMPRESSURE_H
-#define XFEMPRESSURE_H
+#pragma once
 
 // Moose Includes
 #include "DiracKernel.h"
@@ -26,7 +25,7 @@ public:
 protected:
   const int _component;
   const Real _factor;
-  Function * const _function;
+  const Function * const _function;
 
   std::map<unsigned int, std::shared_ptr<ElementPairLocator>> * _element_pair_locators;
   std::map<const Elem *, std::map<unsigned int, Point>> _elem_qp_normal;
@@ -35,5 +34,3 @@ protected:
 
 template <>
 InputParameters validParams<XFEMPressure>();
-
-#endif // XFEMPRESSURE_H

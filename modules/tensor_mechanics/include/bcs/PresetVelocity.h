@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PRESETVELOCITY_H
-#define PRESETVELOCITY_H
+#pragma once
 
 #include "PresetNodalBC.h"
 
@@ -22,10 +21,8 @@ protected:
 
   const VariableValue & _u_old;
   const Real _velocity;
-  Function & _function;
+  const Function & _function;
 };
 
 template <>
 InputParameters validParams<PresetVelocity>();
-
-#endif /* PRESETVELOCITY_H */

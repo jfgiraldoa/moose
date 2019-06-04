@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef NODEFACECONSTRAINT_H
-#define NODEFACECONSTRAINT_H
+#pragma once
 
 // MOOSE includes
 #include "Constraint.h"
@@ -96,6 +95,11 @@ public:
    * The variable on the Master side of the domain.
    */
   virtual MooseVariable & masterVariable() { return _master_var; }
+
+  /**
+   * The variable number that this object operates on.
+   */
+  MooseVariable & variable() { return _var; }
 
   // TODO: Make this protected or add an accessor
   // Do the same for all the other public members
@@ -210,16 +214,18 @@ protected:
   /// Boundary ID for the master surface
   unsigned int _master;
 
+  MooseVariable & _var;
+
   const MooseArray<Point> & _master_q_point;
-  QBase *& _master_qrule;
+  const QBase * const & _master_qrule;
 
 public:
   PenetrationLocator & _penetration_locator;
 
 protected:
   /// current node being processed
-  const Node *& _current_node;
-  const Elem *& _current_master;
+  const Node * const & _current_node;
+  const Elem * const & _current_master;
 
   /// Value of the unknown variable this BC is action on
   const VariableValue & _u_slave;
@@ -269,4 +275,3 @@ public:
   DenseMatrix<Number> _Kee;
 };
 
-#endif

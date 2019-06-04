@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef COUPLEABLE_H
-#define COUPLEABLE_H
+#pragma once
 
 #include <map>
 #include "MooseTypes.h"
@@ -1265,11 +1264,4 @@ template <>
 const VariableGradient & Coupleable::adZeroGradientTemplate<RESIDUAL>();
 template <>
 const VariableSecond & Coupleable::adZeroSecondTemplate<RESIDUAL>();
-template <>
-const RealVectorValue &
-Coupleable::getNodalDefaultValue<RealVectorValue>(const std::string & var_name, unsigned int comp);
-template <>
-MooseVariableFE<RealVectorValue> *
-Coupleable::getVarHelper<RealVectorValue>(const std::string & var_name, unsigned int comp);
 
-#endif /* COUPLEABLE_H */

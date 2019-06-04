@@ -40,8 +40,7 @@
   [./theis_tabulated]
     type = 'CSVDiff'
     input = 'theis_tabulated.i'
-    csvdiff = "theis_csvout.csv"
-    prereq = 'theis'
+    csvdiff = "theis_tabulated_csvout.csv theis_tabulated_csvout_line_0010.csv"
     threading = '!pthreads'
     requirement = 'PorousFlow shall evolve a gas phase as a gas component is added in a water and NCG system'
     design = 'PorousFlowWaterNCG.md'
@@ -77,7 +76,7 @@
   [./theis_brineco2]
     type = 'CSVDiff'
     input = 'theis_brineco2.i'
-    csvdiff = "theis_brineco2_csvout.csv"
+    csvdiff = "theis_brineco2_csvout.csv theis_brineco2_csvout_line_0028.csv"
     heavy = true
     threading = '!pthreads'
     requirement = 'PorousFlow shall evolve a gas phase as CO2 is added to a liquid brine phase'
@@ -101,5 +100,61 @@
     requirement = 'PorousFlow shall calculate the initial value of total mass fraction corresponding to the specified gas saturation in a brine and CO2 system'
     design = 'PorousFlowBrineCO2IC.md'
     issues = '#9377'
+  [../]
+  [./water_vapor_2phase]
+    type = 'CSVDiff'
+    input = 'water_vapor.i'
+    csvdiff = 'water_vapor_twophase.csv'
+    threading = '!pthreads'
+    requirement = 'PorousFlow shall calculate the properties of both the gas and liquid phase in a water-steam system'
+    design = 'PorousFlowWaterVapor.md'
+    issues = '#13108'
+  [../]
+  [./water_vapor_liquid]
+    type = 'CSVDiff'
+    input = 'water_vapor.i'
+    cli_args = '/Variables/h/initial_condition=5e5 /Outputs/file_base=water_vapor_liquid'
+    csvdiff = 'water_vapor_liquid.csv'
+    threading = '!pthreads'
+    requirement = 'PorousFlow shall calculate the liquid properties in a saturated liquid system'
+    design = 'PorousFlowWaterVapor.md'
+    issues = '#13108'
+  [../]
+  [./water_vapor_gas]
+    type = 'CSVDiff'
+    input = 'water_vapor.i'
+    cli_args = '/Variables/h/initial_condition=3e6 /Outputs/file_base=water_vapor_gas'
+    csvdiff = 'water_vapor_gas.csv'
+    threading = '!pthreads'
+    requirement = 'PorousFlow shall calculate the gas properties in a saturated gas system'
+    design = 'PorousFlowWaterVapor.md'
+    issues = '#13108'
+  [../]
+  [./water_vapor_phase_change]
+    type = 'CSVDiff'
+    input = 'water_vapor_phasechange.i'
+    csvdiff = 'water_vapor_phasechange_out.csv'
+    threading = '!pthreads'
+    requirement = 'PorousFlow shall evolve a vapor phase as conditions enter the two phase region'
+    design = 'PorousFlowWaterVapor.md'
+    issues = '#13108'
+  [../]
+  [./geothermal_1d]
+    type = 'CSVDiff'
+    input = 'coldwater_injection.i'
+    csvdiff = 'coldwater_injection_csv_line_0007.csv'
+    threading = '!pthreads'
+    requirement = 'PorousFlow shall calculate the temperature profile in a 1D Avdonin problem'
+    design = 'PorousFlowWaterVapor.md'
+    issues = '#13108'
+  [../]
+  [./geothermal_1d_radial]
+    type = 'CSVDiff'
+    input = 'coldwater_injection_radial.i'
+    csvdiff = 'coldwater_injection_radial_csv_line_0005.csv'
+    threading = '!pthreads'
+    requirement = 'PorousFlow shall calculate the temperature profile in a 1D radial Avdonin problem'
+    design = 'PorousFlowWaterVapor.md'
+    issues = '#13108'
   [../]
 []

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef POLYCRYSTALVORONOIVOIDIC_H
-#define POLYCRYSTALVORONOIVOIDIC_H
+#pragma once
 
 #include "MultiSmoothCircleIC.h"
 #include "MooseRandom.h"
@@ -16,6 +15,8 @@
 
 // Forward Declarationsc
 class PolycrystalVoronoiVoidIC;
+class GrainTrackerInterface;
+class PolycrystalVoronoi;
 
 template <>
 InputParameters validParams<PolycrystalVoronoiVoidIC>();
@@ -37,12 +38,11 @@ protected:
   const MooseEnum _structure_type;
 
   const unsigned int _op_num;
-  unsigned int _grain_num;
   const unsigned int _op_index;
 
-  const unsigned int _rand_seed;
-
   const bool _columnar_3D;
+
+  const PolycrystalVoronoi & _poly_ic_uo;
 
   const FileName _file_name;
 
@@ -51,11 +51,8 @@ protected:
   virtual Real value(const Point & p) override;
   virtual RealGradient gradient(const Point & p) override;
 
-  virtual Real grainValueCalc(const Point & p);
-  virtual void computeGrainCenters();
-
+  unsigned int _grain_num;
   std::vector<Point> _centerpoints;
-  std::vector<unsigned int> _assigned_op;
 
   /// Type for distance and point
   struct DistancePoint
@@ -70,5 +67,3 @@ protected:
     bool operator()(const DistancePoint & a, const DistancePoint & b) { return a.d < b.d; }
   } _customLess;
 };
-
-#endif // POLYCRYSTALVORONOIVOIDIC_H

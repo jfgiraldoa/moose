@@ -265,6 +265,7 @@ MooseApp::MooseApp(InputParameters parameters)
     _type(getParam<std::string>("_type")),
     _comm(getParam<std::shared_ptr<Parallel::Communicator>>("_comm")),
     _perf_graph(type() + " (" + name() + ')'),
+    _rank_map(*_comm, _perf_graph),
     _output_position_set(false),
     _start_time_set(false),
     _start_time(0.0),
@@ -344,7 +345,7 @@ MooseApp::MooseApp(InputParameters parameters)
   if (_check_input && isParamValid("recover"))
     mooseError("Cannot run --check-input with --recover. Recover files might not exist");
 
-  if (isParamValid("start_in_debugger"))
+  if (isParamValid("start_in_debugger") && _multiapp_level == 0)
   {
     auto command = getParam<std::string>("start_in_debugger");
 
@@ -374,7 +375,8 @@ MooseApp::MooseApp(InputParameters parameters)
     std::string command_string = command_stream.str();
     Moose::out << "Running: " << command_string << std::endl;
 
-    std::system(command_string.c_str());
+    int ret = std::system(command_string.c_str());
+    libmesh_ignore(ret);
 
     // Sleep to allow time for the debugger to attach
     std::this_thread::sleep_for(std::chrono::seconds(10));
@@ -974,7 +976,7 @@ MooseApp::setOutputPosition(Point p)
   _output_position = p;
   _output_warehouse.meshChanged();
 
-  if (_executioner.get() != NULL)
+  if (_executioner.get())
     _executioner->parentOutputPositionChanged();
 }
 
@@ -1100,6 +1102,7 @@ MooseApp::dynamicAppRegistration(const std::string & app_name,
                                  std::string library_path,
                                  const std::string & library_name)
 {
+#ifdef LIBMESH_HAVE_DLOPEN
   Parameters params;
   params.set<std::string>("app_name") = app_name;
   params.set<RegistrationType>("reg_type") = APPLICATION;
@@ -1126,6 +1129,9 @@ MooseApp::dynamicAppRegistration(const std::string & app_name,
            "methods.";
     mooseError(oss.str());
   }
+#else
+  mooseError("Dynamic Loading is either not supported or was not detected by libMesh configure.");
+#endif
 }
 
 void
@@ -1136,6 +1142,7 @@ MooseApp::dynamicAllRegistration(const std::string & app_name,
                                  std::string library_path,
                                  const std::string & library_name)
 {
+#ifdef LIBMESH_HAVE_DLOPEN
   Parameters params;
   params.set<std::string>("app_name") = app_name;
   params.set<RegistrationType>("reg_type") = REGALL;
@@ -1148,6 +1155,9 @@ MooseApp::dynamicAllRegistration(const std::string & app_name,
   params.set<ActionFactory *>("action_factory") = action_factory;
 
   dynamicRegistration(params);
+#else
+  mooseError("Dynamic Loading is either not supported or was not detected by libMesh configure.");
+#endif
 }
 
 void
@@ -1240,14 +1250,20 @@ MooseApp::loadLibraryAndDependencies(const std::string & library_filename,
     // Assemble the actual filename using the base path of the *.la file and the dl_lib_filename
     std::string dl_lib_full_path = lib_name_parts.first + '/' + dl_lib_filename;
 
+    MooseUtils::checkFileReadable(dl_lib_full_path, false, /*throw_on_unreadable=*/true);
+
 #ifdef LIBMESH_HAVE_DLOPEN
     void * handle = dlopen(dl_lib_full_path.c_str(), RTLD_LAZY);
 #else
-    void * handle = NULL;
+    void * handle = nullptr;
 #endif
 
     if (!handle)
-      mooseError("Cannot open library: ", dl_lib_full_path.c_str(), "\n");
+      mooseError("The library file \"",
+                 dl_lib_full_path,
+                 "\" exists and has proper permissions, but cannot by dynamically loaded.\nThis "
+                 "generally means that the loader was unable to load one or more of the "
+                 "dependencies listed in the supplied library (see otool or ldd).\n");
 
 // get the pointer to the method in the library.  The dlsym()
 // function returns a null pointer if the symbol cannot be found,
@@ -1256,7 +1272,7 @@ MooseApp::loadLibraryAndDependencies(const std::string & library_filename,
 #ifdef LIBMESH_HAVE_DLOPEN
     void * registration_method = dlsym(handle, registration_method_name.c_str());
 #else
-    void * registration_method = NULL;
+    void * registration_method = nullptr;
 #endif
 
     if (!registration_method)
@@ -1675,6 +1691,13 @@ MooseApp::hasRelationshipManager(const std::string & name) const
 bool
 MooseApp::addRelationshipManager(std::shared_ptr<RelationshipManager> relationship_manager)
 {
+  // We don't need Geometric-only RelationshipManagers when we run with
+  // ReplicatedMesh unless we are splitting the mesh.
+  if (!_action_warehouse.mesh()->isDistributedMesh() && !_split_mesh &&
+      (relationship_manager->isType(Moose::RelationshipManagerType::GEOMETRIC) &&
+       !relationship_manager->isType(Moose::RelationshipManagerType::ALGEBRAIC)))
+    return false;
+
   bool add = true;
   for (const auto & rm : _relationship_managers)
   {
@@ -1774,20 +1797,40 @@ MooseApp::getRelationshipManagerInfo() const
 
   for (const auto & rm : _relationship_managers)
   {
-    auto info = rm->getInfo();
+    std::stringstream oss;
+    oss << rm->getInfo();
 
     auto & for_whom = rm->forWhom();
 
     if (!for_whom.empty())
     {
-      info = info + " for";
+      oss << " for ";
 
-      for (auto & fw : for_whom)
-        info = info + " " + fw;
+      std::copy(for_whom.begin(), for_whom.end(), infix_ostream_iterator<std::string>(oss, ", "));
     }
 
-    if (info.size())
-      info_strings.emplace_back(std::make_pair(Moose::stringify(rm->getType()), info));
+    info_strings.emplace_back(std::make_pair(Moose::stringify(rm->getType()), oss.str()));
+  }
+
+  // List the libMesh GhostingFunctors - Not that in libMesh all of the algebraic and coupling
+  // Ghosting Functors are also attached to the mesh. This should catch them all.
+  const auto & mesh = _action_warehouse.getMesh();
+  if (mesh)
+  {
+    std::unordered_map<std::string, unsigned int> counts;
+
+    for (auto & gf : as_range(mesh->getMesh().ghosting_functors_begin(),
+                              mesh->getMesh().ghosting_functors_end()))
+    {
+      const auto * gf_ptr = dynamic_cast<const RelationshipManager *>(gf);
+      if (!gf_ptr)
+        // Count how many occurances of the same Ghosting Functor types we are encountering
+        counts[demangle(typeid(*gf).name())]++;
+    }
+
+    for (const auto pair : counts)
+      info_strings.emplace_back(std::make_pair(
+          "Default", pair.first + (pair.second > 1 ? " x " + std::to_string(pair.second) : "")));
   }
 
   return info_strings;

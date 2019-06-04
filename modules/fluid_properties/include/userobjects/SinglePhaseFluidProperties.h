@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef SINGLEPHASEFLUIDPROPERTIES_H
-#define SINGLEPHASEFLUIDPROPERTIES_H
+#pragma once
 
 #include "FluidProperties.h"
 
@@ -143,6 +142,7 @@ public:
   propfunc(k, v, e)
   propfunc(s, v, e)
   propfunc(s, h, p)
+  propfunc(T, h, p)
   propfunc(rho, p, s)
   propfunc(e, v, h)
   propfunc(s, p, T)
@@ -169,9 +169,8 @@ public:
   // clang-format on
 
 #undef propfunc
-#pragma GCC diagnostic pop
 
-                              virtual Real s(Real pressure, Real temperature) const;
+                                  virtual Real s(Real pressure, Real temperature) const;
 
   /**
    * Dynamic viscosity and its derivatives wrt density and temperature
@@ -222,6 +221,7 @@ public:
    * @param[in] T   temperature
    */
   virtual Real v_from_p_T(Real p, Real T) const;
+  virtual DualReal v_from_p_T(const DualReal & p, const DualReal & T) const;
 
   /**
    * Specific volume and its derivatives from pressure and temperature
@@ -278,6 +278,7 @@ public:
    * @return internal energy (J/kg)
    */
   virtual Real e_from_p_T(Real p, Real T) const;
+  DualReal e_from_p_T(const DualReal & p, const DualReal & T) const;
   virtual Real e(Real pressure, Real temperature) const;
 
   /**
@@ -297,11 +298,13 @@ public:
   /**
    * Temperature from pressure and specific enthalpy
    *
-   * @param[in] pressure   pressure (Pa)
-   * @param[in] enthalpy   enthalpy (J/kg)
-   * @return Temperature (K)
+   * @param[in] p pressure (Pa)
+   * @param[in] h enthalpy (J/kg)
+   * @return temperature (K)
    */
-  virtual Real T_from_p_h(Real pressure, Real enthalpy) const;
+  virtual Real T_from_p_h(Real p, Real h) const;
+  virtual void T_from_p_h(Real p, Real h, Real & T, Real & dT_dp, Real & dT_dh) const;
+  DualReal T_from_p_h(const DualReal & p, const DualReal & h) const;
 
   /**
    * Molar mass [kg/mol]
@@ -512,6 +515,11 @@ public:
    */
   virtual void vaporPressure(Real temperature, Real & psat, Real & dpsat_dT) const;
   virtual void vaporPressure_dT(Real temperature, Real & psat, Real & dpsat_dT) const;
+  DualReal vaporPressure(const DualReal & temperature) const;
+
+  virtual Real vaporTemperature(Real pressure) const;
+  virtual void vaporTemperature(Real pressure, Real & Tsat, Real & dTsat_dp) const;
+  DualReal vaporTemperature(const DualReal & pressure) const;
 
 protected:
   /**
@@ -540,4 +548,4 @@ private:
   }
 };
 
-#endif /* SINGLEPHASEFLUIDPROPERTIES_H */
+#pragma GCC diagnostic pop

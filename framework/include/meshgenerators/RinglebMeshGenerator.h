@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef RINGLEBMESHGENERATOR_H
-#define RINGLEBMESHGENERATOR_H
+#pragma once
 
 #include "MeshGenerator.h"
 
@@ -29,7 +28,7 @@ public:
   // No copy
   RinglebMeshGenerator & operator=(const RinglebMeshGenerator & other_mesh) = delete;
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
   // This function computes the different parameters a, rho, p and J
   std::vector<Real> arhopj(const Real & gamma, const std::vector<Real> & q, const int & index);
@@ -71,4 +70,3 @@ protected:
   const bool & _triangles;
 };
 
-#endif // RINGLEBMESHGENERATOR_H

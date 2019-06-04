@@ -208,12 +208,11 @@ FEProblemBase::FEProblemBase(const InputParameters & parameters)
     _t_step(declareRecoverableData<int>("t_step")),
     _dt(declareRestartableData<Real>("dt")),
     _dt_old(declareRestartableData<Real>("dt_old")),
-    _nl(NULL),
-    _aux(NULL),
+    _nl(nullptr),
+    _aux(nullptr),
     _coupling(Moose::COUPLING_DIAG),
     _distributions(/*threaded=*/false),
     _samplers(_app.getExecuteOnEnum()),
-    _scalar_ics(/*threaded=*/false),
     _material_props(
         declareRestartableDataWithContext<MaterialPropertyStorage>("material_props", &_mesh)),
     _bnd_material_props(
@@ -233,8 +232,9 @@ FEProblemBase::FEProblemBase(const InputParameters & parameters)
     _adaptivity(*this),
     _cycles_completed(0),
 #endif
-    _displaced_mesh(NULL),
+    _displaced_mesh(nullptr),
     _geometric_search_data(*this, _mesh),
+    _mortar_data(),
     _reinit_displaced_elem(false),
     _reinit_displaced_face(false),
     _input_file_saved(false),
@@ -598,7 +598,7 @@ FEProblemBase::initialSetup()
   {
     ExodusII_IO * reader = _mesh.exReader();
 
-    if (reader != NULL)
+    if (reader)
     {
       _nl->copyVars(*reader);
       _aux->copyVars(*reader);
@@ -679,7 +679,7 @@ FEProblemBase::initialSetup()
 
     for (THREAD_ID tid = 0; tid < n_threads; tid++)
       _ics.initialSetup(tid);
-    _scalar_ics.sort();
+    _scalar_ics.initialSetup();
     projectSolution();
   }
 
@@ -768,6 +768,22 @@ FEProblemBase::initialSetup()
   _mesh.updateActiveSemiLocalNodeRange(_ghosted_elems);
   if (_displaced_mesh)
     _displaced_mesh->updateActiveSemiLocalNodeRange(_ghosted_elems);
+
+  // We need to move the mesh in order to build a map between mortar slave and master
+  // interfaces. This map will then be used by the AgumentSparsityOnInterface ghosting functor to
+  // know which dofs we need ghosted when we call EquationSystems::reinit
+  if (_displaced_problem && _mortar_data.hasDisplacedObjects())
+    _displaced_problem->updateMesh();
+
+  // Build the mortar segment meshes for a couple reasons:
+  // 1) Get the ghosting correct for both static and dynamic meshes
+  // 2) Make sure the mortar mesh is built for mortar constraints that live on the static mesh
+  //
+  // It is worth-while to note that mortar meshes that live on a dynamic mesh will be built
+  // during residual and Jacobian evaluation because when displacements are solution variables
+  // the mortar mesh will move and change during the course of a non-linear solve. We DO NOT
+  // redo ghosting during non-linear solve, so for purpose 1) the below call has to be made
+  updateMortarMesh();
 
   // Possibly reinit one more time to get ghosting correct
   reinitBecauseOfGhostingOrNewGeomObjects();
@@ -1050,7 +1066,7 @@ FEProblemBase::prepare(const Elem * elem, THREAD_ID tid)
   if (_has_nonlocal_coupling)
     _assembly[tid]->prepareNonlocal();
 
-  if (_displaced_problem != NULL && (_reinit_displaced_elem || _reinit_displaced_face))
+  if (_displaced_problem && (_reinit_displaced_elem || _reinit_displaced_face))
   {
     _displaced_problem->prepare(_displaced_mesh->elemPtr(elem->id()), tid);
     if (_has_nonlocal_coupling)
@@ -1064,7 +1080,7 @@ FEProblemBase::prepareFace(const Elem * elem, THREAD_ID tid)
   _nl->prepareFace(tid, true);
   _aux->prepareFace(tid, false);
 
-  if (_displaced_problem != NULL && (_reinit_displaced_elem || _reinit_displaced_face))
+  if (_displaced_problem && (_reinit_displaced_elem || _reinit_displaced_face))
     _displaced_problem->prepareFace(_displaced_mesh->elemPtr(elem->id()), tid);
 }
 
@@ -1087,7 +1103,7 @@ FEProblemBase::prepare(const Elem * elem,
       _assembly[tid]->prepareBlockNonlocal(ivar, jvar, dof_indices, jv.allDofIndices());
     }
 
-  if (_displaced_problem != NULL && (_reinit_displaced_elem || _reinit_displaced_face))
+  if (_displaced_problem && (_reinit_displaced_elem || _reinit_displaced_face))
   {
     _displaced_problem->prepare(_displaced_mesh->elemPtr(elem->id()), ivar, jvar, dof_indices, tid);
     if (_has_nonlocal_coupling)
@@ -1104,7 +1120,7 @@ FEProblemBase::setCurrentSubdomainID(const Elem * elem, THREAD_ID tid)
 {
   SubdomainID did = elem->subdomain_id();
   _assembly[tid]->setCurrentSubdomainID(did);
-  if (_displaced_problem != NULL && (_reinit_displaced_elem || _reinit_displaced_face))
+  if (_displaced_problem && (_reinit_displaced_elem || _reinit_displaced_face))
     _displaced_problem->assembly(tid).setCurrentSubdomainID(did);
 }
 
@@ -1113,7 +1129,7 @@ FEProblemBase::setNeighborSubdomainID(const Elem * elem, unsigned int side, THRE
 {
   SubdomainID did = elem->neighbor_ptr(side)->subdomain_id();
   _assembly[tid]->setCurrentNeighborSubdomainID(did);
-  if (_displaced_problem != NULL && (_reinit_displaced_elem || _reinit_displaced_face))
+  if (_displaced_problem && (_reinit_displaced_elem || _reinit_displaced_face))
     _displaced_problem->assembly(tid).setCurrentNeighborSubdomainID(did);
 }
 
@@ -1122,7 +1138,7 @@ FEProblemBase::setNeighborSubdomainID(const Elem * elem, THREAD_ID tid)
 {
   SubdomainID did = elem->subdomain_id();
   _assembly[tid]->setCurrentNeighborSubdomainID(did);
-  if (_displaced_problem != NULL && (_reinit_displaced_elem || _reinit_displaced_face))
+  if (_displaced_problem && (_reinit_displaced_elem || _reinit_displaced_face))
     _displaced_problem->assembly(tid).setCurrentNeighborSubdomainID(did);
 }
 
@@ -1133,7 +1149,7 @@ FEProblemBase::prepareAssembly(THREAD_ID tid)
   if (_has_nonlocal_coupling)
     _assembly[tid]->prepareNonlocal();
 
-  if (_displaced_problem != NULL && (_reinit_displaced_elem || _reinit_displaced_face))
+  if (_displaced_problem && (_reinit_displaced_elem || _reinit_displaced_face))
   {
     _displaced_problem->prepareAssembly(tid);
     if (_has_nonlocal_coupling)
@@ -1420,7 +1436,7 @@ FEProblemBase::reinitDirac(const Elem * elem, THREAD_ID tid)
     _assembly[tid]->prepareNonlocal();
 
   bool have_points = n_points > 0;
-  if (_displaced_problem != NULL && (_reinit_displaced_elem))
+  if (_displaced_problem && (_reinit_displaced_elem))
   {
     have_points |= _displaced_problem->reinitDirac(_displaced_mesh->elemPtr(elem->id()), tid);
     if (_has_nonlocal_coupling)
@@ -1436,7 +1452,7 @@ FEProblemBase::reinitElem(const Elem * elem, THREAD_ID tid)
   _nl->reinitElem(elem, tid);
   _aux->reinitElem(elem, tid);
 
-  if (_displaced_problem != NULL && _reinit_displaced_elem)
+  if (_displaced_problem && _reinit_displaced_elem)
     _displaced_problem->reinitElem(_displaced_mesh->elemPtr(elem->id()), tid);
 }
 
@@ -1456,7 +1472,7 @@ FEProblemBase::reinitElemPhys(const Elem * elem,
   if (_has_nonlocal_coupling)
     _assembly[tid]->prepareNonlocal();
 
-  if (_displaced_problem != NULL && _reinit_displaced_elem && !suppress_displaced_init)
+  if (_displaced_problem && _reinit_displaced_elem && !suppress_displaced_init)
   {
     _displaced_problem->reinitElemPhys(
         _displaced_mesh->elemPtr(elem->id()), phys_points_in_elem, tid);
@@ -1476,7 +1492,7 @@ FEProblemBase::reinitElemFace(const Elem * elem,
   _nl->reinitElemFace(elem, side, bnd_id, tid);
   _aux->reinitElemFace(elem, side, bnd_id, tid);
 
-  if (_displaced_problem != NULL && _reinit_displaced_face)
+  if (_displaced_problem && _reinit_displaced_face)
     _displaced_problem->reinitElemFace(_displaced_mesh->elemPtr(elem->id()), side, bnd_id, tid);
 }
 
@@ -1485,7 +1501,7 @@ FEProblemBase::reinitNode(const Node * node, THREAD_ID tid)
 {
   _assembly[tid]->reinit(node);
 
-  if (_displaced_problem != NULL && _reinit_displaced_elem)
+  if (_displaced_problem && _reinit_displaced_elem)
     _displaced_problem->reinitNode(&_displaced_mesh->nodeRef(node->id()), tid);
 
   _nl->reinitNode(node, tid);
@@ -1497,7 +1513,7 @@ FEProblemBase::reinitNodeFace(const Node * node, BoundaryID bnd_id, THREAD_ID ti
 {
   _assembly[tid]->reinit(node);
 
-  if (_displaced_problem != NULL && _reinit_displaced_face)
+  if (_displaced_problem && _reinit_displaced_face)
     _displaced_problem->reinitNodeFace(&_displaced_mesh->nodeRef(node->id()), bnd_id, tid);
 
   _nl->reinitNodeFace(node, bnd_id, tid);
@@ -1507,7 +1523,7 @@ FEProblemBase::reinitNodeFace(const Node * node, BoundaryID bnd_id, THREAD_ID ti
 void
 FEProblemBase::reinitNodes(const std::vector<dof_id_type> & nodes, THREAD_ID tid)
 {
-  if (_displaced_problem != NULL && _reinit_displaced_elem)
+  if (_displaced_problem && _reinit_displaced_elem)
     _displaced_problem->reinitNodes(nodes, tid);
 
   _nl->reinitNodes(nodes, tid);
@@ -1517,7 +1533,7 @@ FEProblemBase::reinitNodes(const std::vector<dof_id_type> & nodes, THREAD_ID tid
 void
 FEProblemBase::reinitNodesNeighbor(const std::vector<dof_id_type> & nodes, THREAD_ID tid)
 {
-  if (_displaced_problem != NULL && _reinit_displaced_elem)
+  if (_displaced_problem && _reinit_displaced_elem)
     _displaced_problem->reinitNodesNeighbor(nodes, tid);
 
   _nl->reinitNodesNeighbor(nodes, tid);
@@ -1527,7 +1543,7 @@ FEProblemBase::reinitNodesNeighbor(const std::vector<dof_id_type> & nodes, THREA
 void
 FEProblemBase::reinitScalars(THREAD_ID tid)
 {
-  if (_displaced_problem != NULL && _reinit_displaced_elem)
+  if (_displaced_problem && _reinit_displaced_elem)
     _displaced_problem->reinitScalars(tid);
 
   _nl->reinitScalars(tid);
@@ -1540,7 +1556,7 @@ void
 FEProblemBase::reinitOffDiagScalars(THREAD_ID tid)
 {
   _assembly[tid]->prepareOffDiagScalar();
-  if (_displaced_problem != NULL)
+  if (_displaced_problem)
     _displaced_problem->reinitOffDiagScalars(tid);
 }
 
@@ -1564,7 +1580,7 @@ FEProblemBase::reinitNeighbor(const Elem * elem, unsigned int side, THREAD_ID ti
   _nl->reinitNeighborFace(neighbor, neighbor_side, bnd_id, tid);
   _aux->reinitNeighborFace(neighbor, neighbor_side, bnd_id, tid);
 
-  if (_displaced_problem != NULL && _reinit_displaced_face)
+  if (_displaced_problem && _reinit_displaced_face)
     _displaced_problem->reinitNeighbor(elem, side, tid);
 }
 
@@ -1589,7 +1605,7 @@ FEProblemBase::reinitNeighborPhys(const Elem * neighbor,
   _aux->reinitNeighborFace(neighbor, neighbor_side, 0, tid);
 
   // Do the same for the displaced problem
-  if (_displaced_problem != NULL && _reinit_displaced_face)
+  if (_displaced_problem && _reinit_displaced_face)
     _displaced_problem->reinitNeighborPhys(
         _displaced_mesh->elemPtr(neighbor->id()), neighbor_side, physical_points, tid);
 }
@@ -1614,7 +1630,7 @@ FEProblemBase::reinitNeighborPhys(const Elem * neighbor,
   _aux->reinitNeighbor(neighbor, tid);
 
   // Do the same for the displaced problem
-  if (_displaced_problem != NULL && _reinit_displaced_elem)
+  if (_displaced_problem && _reinit_displaced_elem)
     _displaced_problem->reinitNeighborPhys(
         _displaced_mesh->elemPtr(neighbor->id()), physical_points, tid);
 }
@@ -1857,7 +1873,7 @@ FEProblemBase::addKernel(const std::string & kernel_name,
                          const std::string & name,
                          InputParameters parameters)
 {
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
   {
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
     parameters.set<SystemBase *>("_sys") = &_displaced_problem->nlSys();
@@ -1868,7 +1884,7 @@ FEProblemBase::addKernel(const std::string & kernel_name,
   }
   else
   {
-    if (_displaced_problem == NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem == nullptr && parameters.get<bool>("use_displaced_mesh"))
     {
       // We allow Kernels to request that they use_displaced_mesh,
       // but then be overridden when no displacements variables are
@@ -1890,7 +1906,7 @@ FEProblemBase::addNodalKernel(const std::string & kernel_name,
                               const std::string & name,
                               InputParameters parameters)
 {
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
   {
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
     parameters.set<SystemBase *>("_sys") = &_displaced_problem->nlSys();
@@ -1898,7 +1914,7 @@ FEProblemBase::addNodalKernel(const std::string & kernel_name,
   }
   else
   {
-    if (_displaced_problem == NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem == nullptr && parameters.get<bool>("use_displaced_mesh"))
     {
       // We allow NodalKernels to request that they use_displaced_mesh,
       // but then be overridden when no displacements variables are
@@ -1919,14 +1935,14 @@ FEProblemBase::addScalarKernel(const std::string & kernel_name,
                                const std::string & name,
                                InputParameters parameters)
 {
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
   {
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
     parameters.set<SystemBase *>("_sys") = &_displaced_problem->nlSys();
   }
   else
   {
-    if (_displaced_problem == NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem == nullptr && parameters.get<bool>("use_displaced_mesh"))
     {
       // We allow ScalarKernels to request that they use_displaced_mesh,
       // but then be overridden when no displacements variables are
@@ -1948,7 +1964,7 @@ FEProblemBase::addBoundaryCondition(const std::string & bc_name,
                                     const std::string & name,
                                     InputParameters parameters)
 {
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
   {
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
     parameters.set<SystemBase *>("_sys") = &_displaced_problem->nlSys();
@@ -1959,7 +1975,7 @@ FEProblemBase::addBoundaryCondition(const std::string & bc_name,
   }
   else
   {
-    if (_displaced_problem == NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem == nullptr && parameters.get<bool>("use_displaced_mesh"))
     {
       // We allow Materials to request that they use_displaced_mesh,
       // but then be overridden when no displacements variables are
@@ -1983,7 +1999,7 @@ FEProblemBase::addConstraint(const std::string & c_name,
 {
   _has_constraints = true;
 
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
   {
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
     parameters.set<SystemBase *>("_sys") = &_displaced_problem->nlSys();
@@ -2045,7 +2061,7 @@ FEProblemBase::addAuxKernel(const std::string & kernel_name,
                             const std::string & name,
                             InputParameters parameters)
 {
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
   {
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
     parameters.set<SystemBase *>("_sys") = &_displaced_problem->auxSys();
@@ -2057,7 +2073,7 @@ FEProblemBase::addAuxKernel(const std::string & kernel_name,
   }
   else
   {
-    if (_displaced_problem == NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem == nullptr && parameters.get<bool>("use_displaced_mesh"))
     {
       // We allow AuxKernels to request that they use_displaced_mesh,
       // but then be overridden when no displacements variables are
@@ -2080,14 +2096,14 @@ FEProblemBase::addAuxScalarKernel(const std::string & kernel_name,
                                   const std::string & name,
                                   InputParameters parameters)
 {
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
   {
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
     parameters.set<SystemBase *>("_sys") = &_displaced_problem->auxSys();
   }
   else
   {
-    if (_displaced_problem == NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem == nullptr && parameters.get<bool>("use_displaced_mesh"))
     {
       // We allow AuxScalarKernels to request that they use_displaced_mesh,
       // but then be overridden when no displacements variables are
@@ -2109,7 +2125,7 @@ FEProblemBase::addDiracKernel(const std::string & kernel_name,
                               const std::string & name,
                               InputParameters parameters)
 {
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
   {
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
     parameters.set<SystemBase *>("_sys") = &_displaced_problem->nlSys();
@@ -2117,7 +2133,7 @@ FEProblemBase::addDiracKernel(const std::string & kernel_name,
   }
   else
   {
-    if (_displaced_problem == NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem == nullptr && parameters.get<bool>("use_displaced_mesh"))
     {
       // We allow DiracKernels to request that they use_displaced_mesh,
       // but then be overridden when no displacements variables are
@@ -2141,7 +2157,7 @@ FEProblemBase::addDGKernel(const std::string & dg_kernel_name,
                            const std::string & name,
                            InputParameters parameters)
 {
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
   {
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
     parameters.set<SystemBase *>("_sys") = &_displaced_problem->nlSys();
@@ -2149,7 +2165,7 @@ FEProblemBase::addDGKernel(const std::string & dg_kernel_name,
   }
   else
   {
-    if (_displaced_problem == NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem == nullptr && parameters.get<bool>("use_displaced_mesh"))
     {
       // We allow DGKernels to request that they use_displaced_mesh,
       // but then be overridden when no displacements variables are
@@ -2175,7 +2191,7 @@ FEProblemBase::addInterfaceKernel(const std::string & interface_kernel_name,
                                   const std::string & name,
                                   InputParameters parameters)
 {
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
   {
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
     parameters.set<SystemBase *>("_sys") = &_displaced_problem->nlSys();
@@ -2183,7 +2199,7 @@ FEProblemBase::addInterfaceKernel(const std::string & interface_kernel_name,
   }
   else
   {
-    if (_displaced_problem == NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem == nullptr && parameters.get<bool>("use_displaced_mesh"))
     {
       // We allow InterfaceKernels to request that they use_displaced_mesh,
       // but then be overridden when no displacements variables are
@@ -2383,14 +2399,14 @@ FEProblemBase::addMaterialHelper(std::vector<MaterialWarehouse *> warehouses,
                                  const std::string & name,
                                  InputParameters parameters)
 {
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
   {
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
     _reinit_displaced_elem = true;
   }
   else
   {
-    if (_displaced_problem == NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem == nullptr && parameters.get<bool>("use_displaced_mesh"))
     {
       // We allow Materials to request that they use_displaced_mesh,
       // but then be overridden when no displacements variables are
@@ -2513,7 +2529,7 @@ FEProblemBase::reinitMaterials(SubdomainID blk_id, THREAD_ID tid, bool swap_stat
 {
   if (hasActiveMaterialProperties(tid))
   {
-    const Elem *& elem = _assembly[tid]->elem();
+    auto && elem = _assembly[tid]->elem();
     unsigned int n_points = _assembly[tid]->qRule()->n_points();
     _material_data[tid]->resize(n_points);
 
@@ -2537,7 +2553,7 @@ FEProblemBase::reinitMaterialsFace(SubdomainID blk_id, THREAD_ID tid, bool swap_
 {
   if (hasActiveMaterialProperties(tid))
   {
-    const Elem *& elem = _assembly[tid]->elem();
+    auto && elem = _assembly[tid]->elem();
     unsigned int side = _assembly[tid]->side();
     unsigned int n_points = _assembly[tid]->qRuleFace()->n_points();
 
@@ -2568,7 +2584,7 @@ FEProblemBase::reinitMaterialsNeighbor(SubdomainID blk_id, THREAD_ID tid, bool s
   if (hasActiveMaterialProperties(tid))
   {
     // NOTE: this will not work with h-adaptivity
-    const Elem *& neighbor = _assembly[tid]->neighbor();
+    auto && neighbor = _assembly[tid]->neighbor();
     unsigned int neighbor_side = neighbor->which_neighbor_am_i(_assembly[tid]->elem());
     unsigned int n_points = _assembly[tid]->qRuleFace()->n_points();
     _neighbor_material_data[tid]->resize(n_points);
@@ -2598,7 +2614,7 @@ FEProblemBase::reinitMaterialsBoundary(BoundaryID boundary_id, THREAD_ID tid, bo
 {
   if (hasActiveMaterialProperties(tid))
   {
-    const Elem *& elem = _assembly[tid]->elem();
+    auto && elem = _assembly[tid]->elem();
     unsigned int side = _assembly[tid]->side();
     unsigned int n_points = _assembly[tid]->qRuleFace()->n_points();
     _bnd_material_data[tid]->resize(n_points);
@@ -2625,14 +2641,14 @@ FEProblemBase::reinitMaterialsBoundary(BoundaryID boundary_id, THREAD_ID tid, bo
 void
 FEProblemBase::swapBackMaterials(THREAD_ID tid)
 {
-  const Elem *& elem = _assembly[tid]->elem();
+  auto && elem = _assembly[tid]->elem();
   _material_data[tid]->swapBack(*elem);
 }
 
 void
 FEProblemBase::swapBackMaterialsFace(THREAD_ID tid)
 {
-  const Elem *& elem = _assembly[tid]->elem();
+  auto && elem = _assembly[tid]->elem();
   unsigned int side = _assembly[tid]->side();
   _bnd_material_data[tid]->swapBack(*elem, side);
 }
@@ -2641,65 +2657,9 @@ void
 FEProblemBase::swapBackMaterialsNeighbor(THREAD_ID tid)
 {
   // NOTE: this will not work with h-adaptivity
-  const Elem *& neighbor = _assembly[tid]->neighbor();
+  auto && neighbor = _assembly[tid]->neighbor();
   unsigned int neighbor_side = neighbor->which_neighbor_am_i(_assembly[tid]->elem());
   _neighbor_material_data[tid]->swapBack(*neighbor, neighbor_side);
-}
-
-/**
- * Small helper function used by addPostprocessor to try to get a Postprocessor pointer from a
- * MooseObject
- */
-std::shared_ptr<Postprocessor>
-getPostprocessorPointer(std::shared_ptr<MooseObject> mo)
-{
-  {
-    std::shared_ptr<ElementPostprocessor> intermediate =
-        std::dynamic_pointer_cast<ElementPostprocessor>(mo);
-    if (intermediate.get())
-      return std::static_pointer_cast<Postprocessor>(intermediate);
-  }
-
-  {
-    std::shared_ptr<NodalPostprocessor> intermediate =
-        std::dynamic_pointer_cast<NodalPostprocessor>(mo);
-    if (intermediate.get())
-      return std::static_pointer_cast<Postprocessor>(intermediate);
-  }
-
-  {
-    std::shared_ptr<InternalSidePostprocessor> intermediate =
-        std::dynamic_pointer_cast<InternalSidePostprocessor>(mo);
-    if (intermediate.get())
-      return std::static_pointer_cast<Postprocessor>(intermediate);
-  }
-
-  {
-    std::shared_ptr<SidePostprocessor> intermediate =
-        std::dynamic_pointer_cast<SidePostprocessor>(mo);
-    if (intermediate.get())
-      return std::static_pointer_cast<Postprocessor>(intermediate);
-  }
-
-  {
-    std::shared_ptr<GeneralPostprocessor> intermediate =
-        std::dynamic_pointer_cast<GeneralPostprocessor>(mo);
-    if (intermediate.get())
-      return std::static_pointer_cast<Postprocessor>(intermediate);
-  }
-
-  return std::shared_ptr<Postprocessor>();
-}
-
-template <typename UO_TYPE, typename PP_TYPE>
-Postprocessor *
-getPostprocessorPointer(UO_TYPE * uo)
-{
-  PP_TYPE * intermediate = dynamic_cast<PP_TYPE *>(uo);
-  if (intermediate)
-    return static_cast<Postprocessor *>(intermediate);
-
-  return NULL;
 }
 
 void
@@ -2747,11 +2707,11 @@ FEProblemBase::addUserObject(std::string user_object_name,
                              const std::string & name,
                              InputParameters parameters)
 {
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
   else
   {
-    if (_displaced_problem == NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem == nullptr && parameters.get<bool>("use_displaced_mesh"))
     {
       // We allow UserObjects to request that they use_displaced_mesh,
       // but then be overridden when no displacements variables are
@@ -2790,7 +2750,7 @@ FEProblemBase::addUserObject(std::string user_object_name,
     auto tguo = std::dynamic_pointer_cast<ThreadedGeneralUserObject>(user_object);
 
     // Account for displaced mesh use
-    if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
     {
       if (euo || nuo)
         _reinit_displaced_elem = true;
@@ -3118,10 +3078,29 @@ FEProblemBase::joinAndFinalize(TheWarehouse::Query query, bool isgen)
 }
 
 void
+FEProblemBase::computeUserObjectByName(const ExecFlagType & type, const std::string & name)
+{
+  TheWarehouse::Query query = theWarehouse()
+                                  .query()
+                                  .condition<AttribSystem>("UserObject")
+                                  .condition<AttribExecOns>(type)
+                                  .condition<AttribName>(name);
+  computeUserObjectsInternal(type, Moose::POST_AUX, query);
+}
+
+void
 FEProblemBase::computeUserObjects(const ExecFlagType & type, const Moose::AuxGroup & group)
 {
   TheWarehouse::Query query =
       theWarehouse().query().condition<AttribSystem>("UserObject").condition<AttribExecOns>(type);
+  computeUserObjectsInternal(type, group, query);
+}
+
+void
+FEProblemBase::computeUserObjectsInternal(const ExecFlagType & type,
+                                          const Moose::AuxGroup & group,
+                                          TheWarehouse::Query & query)
+{
   if (group == Moose::PRE_IC)
     query.condition<AttribPreIC>(true);
   else if (group == Moose::PRE_AUX)
@@ -3339,7 +3318,8 @@ FEProblemBase::reinitBecauseOfGhostingOrNewGeomObjects()
 
   // Need to see if _any_ processor has ghosted elems or geometry objects.
   bool needs_reinit = !_ghosted_elems.empty();
-  needs_reinit = needs_reinit || !_geometric_search_data._nearest_node_locators.empty();
+  needs_reinit = needs_reinit || !_geometric_search_data._nearest_node_locators.empty() ||
+                 _mortar_data.hasObjects();
   needs_reinit =
       needs_reinit ||
       (_displaced_problem && !_displaced_problem->geomSearchData()._nearest_node_locators.empty());
@@ -3378,7 +3358,7 @@ FEProblemBase::addIndicator(std::string indicator_name,
                             const std::string & name,
                             InputParameters parameters)
 {
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
   {
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
     parameters.set<SystemBase *>("_sys") = &_displaced_problem->auxSys();
@@ -3386,7 +3366,7 @@ FEProblemBase::addIndicator(std::string indicator_name,
   }
   else
   {
-    if (_displaced_problem == NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem == nullptr && parameters.get<bool>("use_displaced_mesh"))
     {
       // We allow Indicators to request that they use_displaced_mesh,
       // but then be overridden when no displacements variables are
@@ -3423,7 +3403,7 @@ FEProblemBase::addMarker(std::string marker_name,
                          const std::string & name,
                          InputParameters parameters)
 {
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
   {
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
     parameters.set<SystemBase *>("_sys") = &_displaced_problem->auxSys();
@@ -3431,7 +3411,7 @@ FEProblemBase::addMarker(std::string marker_name,
   }
   else
   {
-    if (_displaced_problem == NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem == nullptr && parameters.get<bool>("use_displaced_mesh"))
     {
       // We allow Markers to request that they use_displaced_mesh,
       // but then be overridden when no displacements variables are
@@ -3460,7 +3440,7 @@ FEProblemBase::addMultiApp(const std::string & multi_app_name,
   parameters.set<MPI_Comm>("_mpi_comm") = _communicator.get();
   parameters.set<std::shared_ptr<CommandLine>>("_command_line") = _app.commandLine();
 
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
   {
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
     parameters.set<SystemBase *>("_sys") = &_displaced_problem->auxSys();
@@ -3468,7 +3448,7 @@ FEProblemBase::addMultiApp(const std::string & multi_app_name,
   }
   else
   {
-    if (_displaced_problem == NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem == nullptr && parameters.get<bool>("use_displaced_mesh"))
     {
       // We allow MultiApps to request that they use_displaced_mesh,
       // but then be overridden when no displacements variables are
@@ -3549,6 +3529,15 @@ FEProblemBase::getTransfers(ExecFlagType type, MultiAppTransfer::DIRECTION direc
                                                   ? _to_multi_app_transfers[type]
                                                   : _from_multi_app_transfers[type];
   return wh.getActiveObjects();
+}
+
+const ExecuteMooseObjectWarehouse<Transfer> &
+FEProblemBase::getMultiAppTransferWarehouse(MultiAppTransfer::DIRECTION direction) const
+{
+  if (direction == MultiAppTransfer::TO_MULTIAPP)
+    return _to_multi_app_transfers;
+  else
+    return _from_multi_app_transfers;
 }
 
 bool
@@ -3725,7 +3714,7 @@ FEProblemBase::addTransfer(const std::string & transfer_name,
                            const std::string & name,
                            InputParameters parameters)
 {
-  if (_displaced_problem != NULL && parameters.get<bool>("use_displaced_mesh"))
+  if (_displaced_problem && parameters.get<bool>("use_displaced_mesh"))
   {
     parameters.set<SubProblem *>("_subproblem") = _displaced_problem.get();
     parameters.set<SystemBase *>("_sys") = &_displaced_problem->auxSys();
@@ -3733,7 +3722,7 @@ FEProblemBase::addTransfer(const std::string & transfer_name,
   }
   else
   {
-    if (_displaced_problem == NULL && parameters.get<bool>("use_displaced_mesh"))
+    if (_displaced_problem == nullptr && parameters.get<bool>("use_displaced_mesh"))
     {
       // We allow Transfers to request that they use_displaced_mesh,
       // but then be overridden when no displacements variables are
@@ -3747,10 +3736,13 @@ FEProblemBase::addTransfer(const std::string & transfer_name,
     parameters.set<SystemBase *>("_sys") = _aux.get();
   }
 
-  // Handle the "SAME_AS_MULTIAPP" execute option
-  ExecFlagEnum & exec_enum = parameters.set<ExecFlagEnum>("execute_on", true);
-  if (exec_enum.contains(EXEC_SAME_AS_MULTIAPP))
+  // Handle the "SAME_AS_MULTIAPP" execute option. The get method is used to test for the
+  // flag so the set by user flag is not reset, calling set with the true flag causes the set
+  // by user status to be reset, which should only be done if the EXEC_SAME_AS_MULTIAPP is
+  // being applied to the object.
+  if (parameters.get<ExecFlagEnum>("execute_on").contains(EXEC_SAME_AS_MULTIAPP))
   {
+    ExecFlagEnum & exec_enum = parameters.set<ExecFlagEnum>("execute_on", true);
     std::shared_ptr<MultiApp> multiapp = getMultiApp(parameters.get<MultiAppName>("multi_app"));
     exec_enum = multiapp->getParam<ExecFlagEnum>("execute_on");
   }
@@ -4295,7 +4287,7 @@ FEProblemBase::advanceState()
   _nl->copyOldSolutions();
   _aux->copyOldSolutions();
 
-  if (_displaced_problem != NULL)
+  if (_displaced_problem)
   {
     _displaced_problem->nlSys().copyOldSolutions();
     _displaced_problem->auxSys().copyOldSolutions();
@@ -4322,7 +4314,7 @@ FEProblemBase::restoreSolutions()
   _nl->restoreSolutions();
   _aux->restoreSolutions();
 
-  if (_displaced_problem != NULL)
+  if (_displaced_problem)
     _displaced_problem->updateMesh();
 }
 
@@ -4351,7 +4343,7 @@ FEProblemBase::outputStep(ExecFlagType type)
 
   _nl->update();
   _aux->update();
-  if (_displaced_problem != NULL)
+  if (_displaced_problem)
     _displaced_problem->syncSolutions();
   _app.getOutputWarehouse().outputStep(type);
 }
@@ -4594,10 +4586,12 @@ FEProblemBase::computeResidualTags(const std::set<TagID> & tags)
 
   _aux->residualSetup();
 
-  if (_displaced_problem != NULL)
+  if (_displaced_problem)
   {
     _aux->compute(EXEC_PRE_DISPLACE);
     _displaced_problem->updateMesh();
+    if (_mortar_data.hasDisplacedObjects())
+      updateMortarMesh();
   }
 
   for (THREAD_ID tid = 0; tid < n_threads; tid++)
@@ -4725,7 +4719,7 @@ FEProblemBase::computeJacobianTags(const std::set<TagID> & tags)
 
     _aux->jacobianSetup();
 
-    if (_displaced_problem != NULL)
+    if (_displaced_problem)
     {
       _aux->compute(EXEC_PRE_DISPLACE);
       _displaced_problem->updateMesh();
@@ -4786,7 +4780,7 @@ FEProblemBase::computeJacobianBlocks(std::vector<JacobianBlock *> & blocks)
 {
   TIME_SECTION(_compute_jacobian_blocks_timer);
 
-  if (_displaced_problem != NULL)
+  if (_displaced_problem)
   {
     _aux->compute(EXEC_PRE_DISPLACE);
     _displaced_problem->updateMesh();
@@ -5015,6 +5009,46 @@ FEProblemBase::updateGeomSearch(GeometricSearchData::GeometricSearchType type)
 }
 
 void
+FEProblemBase::updateMortarMesh()
+{
+  _mortar_data.update();
+}
+
+void
+FEProblemBase::createMortarInterface(
+    const std::pair<BoundaryID, BoundaryID> & master_slave_boundary_pair,
+    const std::pair<SubdomainID, SubdomainID> & master_slave_subdomain_pair,
+    bool on_displaced,
+    bool periodic)
+{
+  if (on_displaced)
+    return _mortar_data.createMortarInterface(master_slave_boundary_pair,
+                                              master_slave_subdomain_pair,
+                                              *_displaced_problem,
+                                              on_displaced,
+                                              periodic);
+  else
+    return _mortar_data.createMortarInterface(
+        master_slave_boundary_pair, master_slave_subdomain_pair, *this, on_displaced, periodic);
+}
+
+const AutomaticMortarGeneration &
+FEProblemBase::getMortarInterface(
+    const std::pair<BoundaryID, BoundaryID> & master_slave_boundary_pair,
+    const std::pair<SubdomainID, SubdomainID> & master_slave_subdomain_pair,
+    bool on_displaced) const
+{
+  return _mortar_data.getMortarInterface(
+      master_slave_boundary_pair, master_slave_subdomain_pair, on_displaced);
+}
+
+const std::unordered_map<std::pair<BoundaryID, BoundaryID>, AutomaticMortarGeneration> &
+FEProblemBase::getMortarInterfaces(bool on_displaced) const
+{
+  return _mortar_data.getMortarInterfaces(on_displaced);
+}
+
+void
 FEProblemBase::possiblyRebuildGeomSearchPatches()
 {
   if (_displaced_problem) // Only need to do this if things are moving...
@@ -5172,7 +5206,7 @@ FEProblemBase::initXFEM(std::shared_ptr<XFEMInterface> xfem)
   for (unsigned int i = 0; i < n_threads; ++i)
   {
     _assembly[i]->setXFEM(_xfem);
-    if (_displaced_problem != NULL)
+    if (_displaced_problem)
       _displaced_problem->assembly(i).setXFEM(_xfem);
   }
 }
@@ -5246,7 +5280,7 @@ FEProblemBase::meshChangedHelper(bool intermediate_change)
   // Need to redo ghosting
   _geometric_search_data.reinit();
 
-  if (_displaced_problem != NULL)
+  if (_displaced_problem)
   {
     _displaced_problem->meshChanged();
     _displaced_mesh->updateActiveSemiLocalNodeRange(_ghosted_elems);
@@ -5361,9 +5395,9 @@ FEProblemBase::checkProblemIntegrity()
       }
 
       // also exclude mortar spaces from the material check
-      auto & mortar_ifaces = _mesh.getMortarInterfaces();
-      for (const auto & mortar_iface : mortar_ifaces)
-        local_mesh_subs.erase(mortar_iface->_id);
+      auto && mortar_subdomain_ids = _mortar_data.getMortarSubdomainIDs();
+      for (auto subdomain_id : mortar_subdomain_ids)
+        local_mesh_subs.erase(subdomain_id);
 
       // Check Material Coverage
       if (check_material_coverage && !local_mesh_subs.empty())
@@ -5915,7 +5949,7 @@ FEProblemBase::addOutput(const std::string & object_type,
 
   // Apply the common parameters
   InputParameters * common = output_warehouse.getCommonParameters();
-  if (common != NULL)
+  if (common)
     parameters.applyParameters(*common, exclude);
 
   // Set the correct value for the binary flag for XDA/XDR output
@@ -5939,4 +5973,28 @@ FEProblemBase::haveADObjects(bool have_ad_objects)
   _have_ad_objects = have_ad_objects;
   if (_displaced_problem)
     _displaced_problem->haveADObjects(have_ad_objects);
+}
+
+const SystemBase &
+FEProblemBase::systemBaseNonlinear() const
+{
+  return *_nl;
+}
+
+SystemBase &
+FEProblemBase::systemBaseNonlinear()
+{
+  return *_nl;
+}
+
+const SystemBase &
+FEProblemBase::systemBaseAuxiliary() const
+{
+  return *_aux;
+}
+
+SystemBase &
+FEProblemBase::systemBaseAuxiliary()
+{
+  return *_aux;
 }

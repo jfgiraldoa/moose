@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef RICHARDSEXCAVGEOM
-#define RICHARDSEXCAVGEOM
+#pragma once
 
 #include "Function.h"
 
@@ -48,7 +47,7 @@ class RichardsExcavGeom : public Function
 public:
   RichardsExcavGeom(const InputParameters & parameters);
 
-  virtual Real value(Real t, const Point & p);
+  virtual Real value(Real t, const Point & p) const;
 
 protected:
   /// start position
@@ -78,5 +77,3 @@ protected:
   /// norm of retreat velocity
   Real _norm_retreat_vel;
 };
-
-#endif // RICHARDSEXCAVGEOM

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef SPLINEFUNCTION_H
-#define SPLINEFUNCTION_H
+#pragma once
 
 #include "Function.h"
 #include "SplineInterpolation.h"
@@ -26,11 +25,11 @@ class SplineFunction : public Function
 public:
   SplineFunction(const InputParameters & parameters);
 
-  virtual Real value(Real t, const Point & p) override;
-  virtual RealGradient gradient(Real t, const Point & p) override;
+  virtual Real value(Real t, const Point & p) const override;
+  virtual RealGradient gradient(Real t, const Point & p) const override;
 
-  virtual Real derivative(const Point & p);
-  virtual Real secondDerivative(const Point & p);
+  virtual Real derivative(const Point & p) const;
+  virtual Real secondDerivative(const Point & p) const;
 
 protected:
   SplineInterpolation _ipol;
@@ -38,5 +37,3 @@ protected:
   /// Desired component
   int _component;
 };
-
-#endif /* SPLINEFUNCTION_H */

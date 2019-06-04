@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef QUADRATUREPOINTMARKER_H
-#define QUADRATUREPOINTMARKER_H
+#pragma once
 
 #include "Marker.h"
 #include "Coupleable.h"
@@ -43,7 +42,7 @@ protected:
   const VariableValue & _u;
 
   /// The quadrature rule for the system
-  QBase *& _qrule;
+  const QBase * const & _qrule;
 
   /// Position of the current quadrature point
   const MooseArray<Point> & _q_point;
@@ -55,4 +54,3 @@ protected:
   MarkerValue _third_state;
 };
 
-#endif /* QUADRATUREPOINTMARKER_H */

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PARSER_H
-#define PARSER_H
+#pragma once
 
 // MOOSE includes
 #include "ConsoleStreamInterface.h"
@@ -43,6 +42,8 @@ public:
     auto n_errs = exp.errors.size();
 
     FunctionParser fp;
+    fp.AddConstant("pi", libMesh::pi);
+    fp.AddConstant("e", std::exp(Real(1)));
     std::vector<std::string> var_names;
     auto ret = fp.ParseAndDeduceVariables(func_text, var_names);
     if (ret != -1)
@@ -268,5 +269,3 @@ private:
   std::string hitCLIFilter(std::string appname, const std::vector<std::string> & argv);
   void walkRaw(std::string fullpath, std::string nodepath, hit::Node * n);
 };
-
-#endif // PARSER_H

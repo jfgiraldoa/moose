@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef SUBDOMAINIDGENERATOR_H
-#define SUBDOMAINIDGENERATOR_H
+#pragma once
 
 #include "MeshGenerator.h"
 
@@ -26,7 +25,7 @@ class SubdomainIDGenerator : public MeshGenerator
 public:
   SubdomainIDGenerator(const InputParameters & parameters);
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   std::unique_ptr<MeshBase> & _input;
@@ -35,4 +34,3 @@ protected:
   SubdomainID _subdomain_id;
 };
 
-#endif // SUBDOMAINIDGENERATOR_H

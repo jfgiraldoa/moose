@@ -93,6 +93,9 @@ if [ -z "$go_fast" ]; then
       --FCFLAGS='-fPIC -fopenmp' \
       --F90FLAGS='-fPIC -fopenmp' \
       --F77FLAGS='-fPIC -fopenmp' \
+      --with-cxx-dialect=C++11 \
+      --with-fortran-bindings=0 \
+      --with-sowing=0 \
       $* \
 
    make all

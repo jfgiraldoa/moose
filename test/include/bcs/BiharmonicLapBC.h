@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef BIHARMONICLAPBC_H
-#define BIHARMONICLAPBC_H
+#pragma once
 
 #include "IntegratedBC.h"
 
@@ -32,7 +31,5 @@ protected:
   virtual Real computeQpResidual() override;
 
   /// User-provided function which computes the Laplacian.
-  Function & _lap_u;
+  const Function & _lap_u;
 };
-
-#endif

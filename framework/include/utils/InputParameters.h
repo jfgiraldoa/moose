@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef INPUTPARAMETERS_H
-#define INPUTPARAMETERS_H
+#pragma once
 
 // MOOSE includes
 #include "MooseUtils.h"
@@ -283,6 +282,13 @@ public:
    */
   template <typename T>
   void makeParamRequired(const std::string & name);
+
+  /**
+   * Changes the parameter to not be required.
+   * @param name The parameter name
+   */
+  template <typename T>
+  void makeParamNotRequired(const std::string & name);
 
   /**
    * This method adds a coupled variable name pair.  The parser will look for variable
@@ -645,7 +651,8 @@ public:
    * @see CommonOutputAction AddOutputAction
    */
   void applySpecificParameters(const InputParameters & common,
-                               const std::vector<std::string> & include);
+                               const std::vector<std::string> & include,
+                               bool allow_private = false);
 
   /**
    * Apply values from a single parameter in common, to a single parameter stored in this object
@@ -658,7 +665,9 @@ public:
    *   (3) Local parameter must be invalid OR not have been set from its default
    *   (4) Both cannot be private
    */
-  void applyParameter(const InputParameters & common, const std::string & common_name);
+  void applyParameter(const InputParameters & common,
+                      const std::string & common_name,
+                      bool allow_private = false);
 
   /**
    * Apply properties of a single coupled variable in common, to a single coupled variable stored in
@@ -1304,6 +1313,16 @@ InputParameters::makeParamRequired(const std::string & name)
 
 template <typename T>
 void
+InputParameters::makeParamNotRequired(const std::string & name)
+{
+  if (!this->have_parameter<T>(name))
+    mooseError("Unable to un-require nonexistent parameter: ", name);
+
+  _params[name]._required = false;
+}
+
+template <typename T>
+void
 InputParameters::addDeprecatedParam(const std::string & name,
                                     const T & value,
                                     const std::string & doc_string,
@@ -1453,5 +1472,3 @@ validParams()
 
   mooseError("Missing validParams declaration!");
 }
-
-#endif /* INPUTPARAMETERS_H */

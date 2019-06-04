@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PATTERNEDMESHGENERATOR_H
-#define PATTERNEDMESHGENERATOR_H
+#pragma once
 
 #include "MeshGenerator.h"
 #include "libmesh/replicated_mesh.h"
@@ -34,7 +33,7 @@ class PatternedMeshGenerator : public MeshGenerator
 public:
   PatternedMeshGenerator(const InputParameters & parameters);
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   /// The mesh generators to read
@@ -56,4 +55,3 @@ protected:
   Real _z_width;
 };
 
-#endif // PATTERNEDMESHGENERATOR_H

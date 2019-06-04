@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MOOSEPARSEDGRADFUNCTION_H
-#define MOOSEPARSEDGRADFUNCTION_H
+#pragma once
 
 // MOOSE includes
 #include "Function.h"
@@ -46,7 +45,7 @@ public:
    * @param t Current time
    * @param p The current spatial location
    */
-  virtual Real value(Real t, const Point & p) override;
+  virtual Real value(Real t, const Point & p) const override;
 
   /**
    * Compute the gradient of the function
@@ -54,13 +53,13 @@ public:
    * @param p The current point (x,y,z)
    * @return Gradient of the function
    */
-  virtual RealGradient gradient(Real t, const Point & p) override;
+  virtual RealGradient gradient(Real t, const Point & p) const override;
 
   /**
    * Method invalid for ParsedGradFunction
    * @see ParsedVectorFunction
    */
-  virtual RealVectorValue vectorValue(Real t, const Point & p) override;
+  virtual RealVectorValue vectorValue(Real t, const Point & p) const override;
 
   /**
    * Creates two libMesh::ParsedFunction objects for returning a vector via the 'gradient' method
@@ -78,5 +77,3 @@ protected:
   /// Pointer to the Parsed function wrapper object for the gradient
   std::unique_ptr<MooseParsedFunctionWrapper> _grad_function_ptr;
 };
-
-#endif // MOOSEPARSEDGRADFUNCTION_H

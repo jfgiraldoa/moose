@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef EXPLICITEULER_H
-#define EXPLICITEULER_H
+#pragma once
 
 #include "TimeIntegrator.h"
 
@@ -28,7 +27,7 @@ public:
   virtual void preSolve() override;
   virtual int order() override { return 1; }
   virtual void computeTimeDerivatives() override;
-  virtual void computeADTimeDerivatives(DualReal & ad_u_dot, const dof_id_type & dof) override;
+  void computeADTimeDerivatives(DualReal & ad_u_dot, const dof_id_type & dof) const override;
   virtual void postResidual(NumericVector<Number> & residual) override;
 
 protected:
@@ -36,15 +35,14 @@ protected:
    * Helper function that actually does the math for computing the time derivative
    */
   template <typename T, typename T2>
-  void computeTimeDerivativeHelper(T & u_dot, const T2 & u_old);
+  void computeTimeDerivativeHelper(T & u_dot, const T2 & u_old) const;
 };
 
 template <typename T, typename T2>
 void
-ExplicitEuler::computeTimeDerivativeHelper(T & u_dot, const T2 & u_old)
+ExplicitEuler::computeTimeDerivativeHelper(T & u_dot, const T2 & u_old) const
 {
   u_dot -= u_old;
   u_dot *= 1. / _dt;
 }
 
-#endif /* EXPLICITEULER_H */

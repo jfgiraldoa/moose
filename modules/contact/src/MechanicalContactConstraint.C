@@ -849,6 +849,9 @@ MechanicalContactConstraint::computeQpJacobian(Moose::ConstraintJacobianType typ
 
   switch (type)
   {
+    default:
+      mooseError("Unhandled ConstraintJacobianType");
+
     case Moose::SlaveSlave:
       switch (_model)
       {
@@ -977,7 +980,7 @@ MechanicalContactConstraint::computeQpJacobian(Moose::ConstraintJacobianType typ
           {
             case CF_KINEMATIC:
             {
-              Node * curr_master_node = _current_master->get_node(_j);
+              const Node * curr_master_node = _current_master->node_ptr(_j);
 
               RealVectorValue jac_vec;
               for (unsigned int i = 0; i < _mesh_dimension; ++i)
@@ -1008,7 +1011,7 @@ MechanicalContactConstraint::computeQpJacobian(Moose::ConstraintJacobianType typ
               if (pinfo->_mech_status == PenetrationInfo::MS_SLIPPING ||
                   pinfo->_mech_status == PenetrationInfo::MS_SLIPPING_FRICTION)
               {
-                Node * curr_master_node = _current_master->get_node(_j);
+                const Node * curr_master_node = _current_master->node_ptr(_j);
 
                 RealVectorValue jac_vec;
                 for (unsigned int i = 0; i < _mesh_dimension; ++i)
@@ -1023,7 +1026,7 @@ MechanicalContactConstraint::computeQpJacobian(Moose::ConstraintJacobianType typ
               }
               else
               {
-                Node * curr_master_node = _current_master->get_node(_j);
+                const Node * curr_master_node = _current_master->node_ptr(_j);
                 const Real curr_jac =
                     (*_jacobian)(_current_node->dof_number(0, _vars[_component], 0),
                                  curr_master_node->dof_number(0, _vars[_component], 0));
@@ -1054,7 +1057,7 @@ MechanicalContactConstraint::computeQpJacobian(Moose::ConstraintJacobianType typ
 
             case CF_TANGENTIAL_PENALTY:
             {
-              Node * curr_master_node = _current_master->get_node(_j);
+              const Node * curr_master_node = _current_master->node_ptr(_j);
 
               RealVectorValue jac_vec;
               for (unsigned int i = 0; i < _mesh_dimension; ++i)
@@ -1083,7 +1086,7 @@ MechanicalContactConstraint::computeQpJacobian(Moose::ConstraintJacobianType typ
           {
             case CF_KINEMATIC:
             {
-              Node * curr_master_node = _current_master->get_node(_j);
+              const Node * curr_master_node = _current_master->node_ptr(_j);
               const Real curr_jac =
                   (*_jacobian)(_current_node->dof_number(0, _vars[_component], 0),
                                curr_master_node->dof_number(0, _vars[_component], 0));
@@ -1303,6 +1306,9 @@ MechanicalContactConstraint::computeQpOffDiagJacobian(Moose::ConstraintJacobianT
 
   switch (type)
   {
+    default:
+      mooseError("Unhandled ConstraintJacobianType");
+
     case Moose::SlaveSlave:
       switch (_model)
       {
@@ -1390,7 +1396,7 @@ MechanicalContactConstraint::computeQpOffDiagJacobian(Moose::ConstraintJacobianT
           {
             case CF_KINEMATIC:
             {
-              Node * curr_master_node = _current_master->get_node(_j);
+              const Node * curr_master_node = _current_master->node_ptr(_j);
 
               RealVectorValue jac_vec;
               for (unsigned int i = 0; i < _mesh_dimension; ++i)
@@ -1418,7 +1424,7 @@ MechanicalContactConstraint::computeQpOffDiagJacobian(Moose::ConstraintJacobianT
               (pinfo->_mech_status == PenetrationInfo::MS_SLIPPING ||
                pinfo->_mech_status == PenetrationInfo::MS_SLIPPING_FRICTION))
           {
-            Node * curr_master_node = _current_master->get_node(_j);
+            const Node * curr_master_node = _current_master->node_ptr(_j);
 
             RealVectorValue jac_vec;
             for (unsigned int i = 0; i < _mesh_dimension; ++i)

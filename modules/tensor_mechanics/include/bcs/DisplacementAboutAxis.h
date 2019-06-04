@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef DISPLACEMENTABOUTAXIS_H
-#define DISPLACEMENTABOUTAXIS_H
+#pragma once
 
 #include "PresetNodalBC.h"
 
@@ -50,7 +49,7 @@ protected:
   void calculateTransformationMatrices();
 
   const int _component;
-  Function & _func;
+  const Function & _func;
   MooseEnum _angle_units;
   const Point _axis_origin;
   Point _axis_direction;
@@ -58,5 +57,3 @@ protected:
   ColumnMajorMatrix _transformation_matrix;
   ColumnMajorMatrix _transformation_matrix_inv;
 };
-
-#endif // DISPLACEMENTABOUTAXIS_H

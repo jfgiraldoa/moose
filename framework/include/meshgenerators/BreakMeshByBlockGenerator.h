@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef BREAKMESHBYBLOCKGENERATOR_H
-#define BREAKMESHBYBLOCKGENERATOR_H
+#pragma once
 
 #include "BreakMeshByBlockGeneratorBase.h"
 
@@ -22,7 +21,7 @@ class BreakMeshByBlockGenerator : public BreakMeshByBlockGeneratorBase
 public:
   BreakMeshByBlockGenerator(const InputParameters & parameters);
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   std::unique_ptr<MeshBase> & _input;
@@ -37,4 +36,3 @@ private:
       _new_boundary_sides_map;
 };
 
-#endif /* BREAKMESHBYBLOCK_H */

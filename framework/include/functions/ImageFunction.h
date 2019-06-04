@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef IMAGEFUNCTION_H
-#define IMAGEFUNCTION_H
+#pragma once
 
 // MOOSE includes
 #include "Function.h"
@@ -47,7 +46,5 @@ public:
    * @param t Time (unused)
    * @param p The point at which to extract pixel data
    */
-  virtual Real value(Real t, const Point & p) override;
+  virtual Real value(Real t, const Point & p) const override;
 };
-
-#endif // IMAGEFUNCTION_H

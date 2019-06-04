@@ -9,13 +9,14 @@
 
 from mooseutils import colorText, str2bool, find_moose_executable, runExe, check_configuration
 from mooseutils import find_moose_executable_recursive, run_executable
-from mooseutils import touch, unique_list, gold, make_chunks, check_file_size, camel_to_space
+from mooseutils import touch, unique_list, gold, make_chunks, camel_to_space
 from mooseutils import text_diff, git_ls_files, git_root_dir, is_git_repo, unidiff, text_unidiff
 from mooseutils import run_profile, list_files
 from message import mooseDebug, mooseWarning, mooseMessage, mooseError
 from MooseException import MooseException
 from eval_path import eval_path
 from sqa_check import sqa_check, check_requirement
+from compute_requirement_stats import compute_requirement_stats, SQAStats
 from AutoPropertyMixin import AutoPropertyMixin, Property, addProperty
 import parallel
 

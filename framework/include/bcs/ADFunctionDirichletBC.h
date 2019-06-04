@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ADFUNCTIONDIRICHLETBC_H
-#define ADFUNCTIONDIRICHLETBC_H
+#pragma once
 
 #include "ADNodalBC.h"
 
@@ -32,9 +31,7 @@ protected:
   virtual ADReal computeQpResidual() override;
 
   /// The function describing the Dirichlet condition
-  Function & _function;
+  const Function & _function;
 
   usingNodalBCMembers;
 };
-
-#endif /* ADFUNCTIONDIRICHLETBC_H */

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef COMPUTEELASTICITYTENSORBASE_H
-#define COMPUTEELASTICITYTENSORBASE_H
+#pragma once
 
 #include "DerivativeMaterialInterface.h"
 #include "Material.h"
@@ -39,7 +38,5 @@ protected:
   MaterialProperty<RankFourTensor> & _elasticity_tensor;
 
   /// prefactor function to multiply the elasticity tensor with
-  Function * const _prefactor_function;
+  const Function * const _prefactor_function;
 };
-
-#endif // COMPUTEELASTICITYTENSORBASE_H

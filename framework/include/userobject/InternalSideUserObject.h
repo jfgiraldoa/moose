@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef INTERNALSIDEUSEROBJECT_H
-#define INTERNALSIDEUSEROBJECT_H
+#pragma once
 
 #include "UserObject.h"
 #include "BlockRestrictable.h"
@@ -43,23 +42,22 @@ protected:
   MooseMesh & _mesh;
 
   const MooseArray<Point> & _q_point;
-  QBase *& _qrule;
+  const QBase * const & _qrule;
   const MooseArray<Real> & _JxW;
   const MooseArray<Real> & _coord;
   const MooseArray<Point> & _normals;
 
-  const Elem *& _current_elem;
+  const Elem * const & _current_elem;
   /// current side of the current element
-  unsigned int & _current_side;
+  const unsigned int & _current_side;
 
-  const Elem *& _current_side_elem;
+  const Elem * const & _current_side_elem;
   const Real & _current_side_volume;
 
   /// The neighboring element
-  const Elem *& _neighbor_elem;
+  const Elem * const & _neighbor_elem;
 
   /// The volume (or length) of the current neighbor
   const Real & getNeighborElemVolume();
 };
 
-#endif /* INTERNALSIDEUSEROBJECT_H */

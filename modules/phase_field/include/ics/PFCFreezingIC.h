@@ -7,10 +7,9 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PFCFREEZINGIC_H
-#define PFCFREEZINGIC_H
+#pragma once
 
-#include "InitialCondition.h"
+#include "RandomICBase.h"
 
 // Forward Declarations
 class PFCFreezingIC;
@@ -25,7 +24,7 @@ InputParameters validParams<PFCFreezingIC>();
  * \todo For the FCC this returns 0. This cannot be right, yet it satisfies the (probably bogus)
  * test.
  */
-class PFCFreezingIC : public InitialCondition
+class PFCFreezingIC : public RandomICBase
 {
 public:
   PFCFreezingIC(const InputParameters & parameters);
@@ -53,5 +52,3 @@ private:
 
   unsigned int _icdim;
 };
-
-#endif // PFCFREEZINGIC_H

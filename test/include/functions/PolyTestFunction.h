@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef POLYTESTFUNCTION_H
-#define POLYTESTFUNCTION_H
+#pragma once
 
 #include "Function.h"
 
@@ -22,10 +21,8 @@ class PolyTestFunction : public Function
 public:
   PolyTestFunction(const InputParameters & parameters);
 
-  virtual Real value(Real t, const Point & p);
+  virtual Real value(Real t, const Point & p) const override;
 
   const std::vector<Real> _coeffs;
   const bool _deriv;
 };
-
-#endif // POLYTESTFUNCTION_H

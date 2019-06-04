@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MATERIALPROPERTYINTERFACE_H
-#define MATERIALPROPERTYINTERFACE_H
+#pragma once
 
 // MOOSE includes
 #include "MaterialProperty.h"
@@ -35,6 +34,8 @@ InputParameters validParams<MaterialPropertyInterface>();
 #define adGetADMaterialPropertyByName this->template getADMaterialPropertyByName
 #define adGetMaterialPropertyByName this->template getMaterialPropertyByName
 #define adGetMaterialPropertyOldByName this->template getMaterialPropertyOldByName
+#define adHasMaterialProperty this->template hasMaterialProperty
+#define adHasMaterialPropertyByName this->template hasMaterialPropertyByName
 
 /**
  * \class MaterialPropertyInterface
@@ -506,7 +507,7 @@ MaterialPropertyInterface::hasMaterialProperty(const std::string & name)
 {
   // Check if the supplied parameter is a valid input parameter key
   std::string prop_name = deducePropertyName(name);
-  return _material_data->haveProperty<T>(prop_name);
+  return hasMaterialPropertyByName<T>(prop_name);
 }
 
 template <typename T>
@@ -536,4 +537,3 @@ MaterialPropertyInterface::getZeroMaterialProperty(const std::string & /*prop_na
   return zero;
 }
 
-#endif // MATERIALPROPERTYINTERFACE_H

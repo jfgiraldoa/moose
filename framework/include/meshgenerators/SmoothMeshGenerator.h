@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef SMOOTHMESHGENERATOR_H
-#define SMOOTHMESHGENERATOR_H
+#pragma once
 
 #include "MeshGenerator.h"
 
@@ -26,7 +25,7 @@ class SmoothMeshGenerator : public MeshGenerator
 public:
   SmoothMeshGenerator(const InputParameters & parameters);
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   /// Mesh that possibly comes from another generator
@@ -36,4 +35,3 @@ protected:
   unsigned int _iterations;
 };
 
-#endif // SMOOTHMESHGENERATOR_H

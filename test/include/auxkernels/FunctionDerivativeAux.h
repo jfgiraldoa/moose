@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef FUNCTIONDERIVATIVEAUX_H
-#define FUNCTIONDERIVATIVEAUX_H
+#pragma once
 
 #include "AuxKernel.h"
 
@@ -35,8 +34,6 @@ protected:
   virtual Real computeValue() override;
 
   /// Function being used to compute the value of this kernel
-  Function & _func;
+  const Function & _func;
   unsigned int _component;
 };
-
-#endif // FUNCTIONDERIVATIVEAUX_H

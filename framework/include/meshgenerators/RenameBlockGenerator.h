@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef RENAMEBLOCKGENERATOR_H
-#define RENAMEBLOCKGENERATOR_H
+#pragma once
 
 #include "MeshGenerator.h"
 
@@ -26,7 +25,7 @@ class RenameBlockGenerator : public MeshGenerator
 public:
   RenameBlockGenerator(const InputParameters & parameters);
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   std::unique_ptr<MeshBase> & _input;
@@ -90,4 +89,3 @@ protected:
   SubdomainID newBlockID(const SubdomainName & new_block_name);
 };
 
-#endif // RENAMEBLOCKGENERATOR_H

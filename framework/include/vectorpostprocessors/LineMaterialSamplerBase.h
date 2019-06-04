@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef LINEMATERIALSAMPLERBASE_H
-#define LINEMATERIALSAMPLERBASE_H
+#pragma once
 
 // MOOSE includes
 #include "GeneralVectorPostprocessor.h"
@@ -92,7 +91,7 @@ protected:
   MooseMesh & _mesh;
 
   /// The quadrature rule
-  QBase *& _qrule;
+  const QBase * const & _qrule;
 
   /// The quadrature points
   const MooseArray<Point> & _q_point;
@@ -190,4 +189,3 @@ LineMaterialSamplerBase<T>::finalize()
   SamplerBase::finalize();
 }
 
-#endif

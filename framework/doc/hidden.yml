@@ -8,7 +8,6 @@
 - /Adaptivity/Indicators/ValueJumpIndicator
 - /Adaptivity/Markers/AddElementalFieldAction
 - /Adaptivity/Markers/AddMarkerAction
-- /AuxKernels
 - /AuxKernels/AddKernelAction
 - /AuxKernels/BoundsAux
 - /AuxKernels/DebugResidualAux
@@ -32,7 +31,6 @@
 - /AuxScalarKernels/ConstantScalarAux
 - /AuxScalarKernels/FunctionScalarAux
 - /AuxScalarKernels/QuotientScalarAux
-- /AuxVariables
 - /AuxVariables/AddAuxVariableAction
 - /AuxVariables/CopyNodalVarsAction
 - /AuxVariables/InitialCondition
@@ -159,8 +157,6 @@
 - /Mesh/CreateDisplacedProblemAction
 - /Mesh/SetupMeshAction
 - /Mesh/SetupMeshCompleteAction
-- /Mesh/MortarInterfaces
-- /Mesh/MortarInterfaces/AddMortarInterfaceAction
 - /Mesh/Partitioner
 - /Mesh/Partitioner/PartitionerAction
 - /Mesh/Partitioner/LibmeshPartitioner
@@ -196,7 +192,6 @@
 - /Outputs/AddOutputAction
 - /Outputs/CSV
 - /Outputs/Checkpoint
-- /Outputs/Console
 - /Outputs/ControlOutput
 - /Outputs/DOFMap
 - /Outputs/GMV
@@ -312,7 +307,6 @@
 - /UserObjects/Terminator
 - /UserObjects/VerifyElementUniqueID
 - /UserObjects/VerifyNodalUniqueID
-- /Variables
 - /Variables/AddVariableAction
 - /Variables/CopyNodalVarsAction
 - /Variables/InitialCondition

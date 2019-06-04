@@ -1,16 +1,11 @@
-/****************************************************************/
-/*               DO NOT MODIFY THIS HEADER                      */
-/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
-/*                                                              */
-/*           (c) 2010 Battelle Energy Alliance, LLC             */
-/*                   ALL RIGHTS RESERVED                        */
-/*                                                              */
-/*          Prepared by Battelle Energy Alliance, LLC           */
-/*            Under Contract No. DE-AC07-05ID14517              */
-/*            With the U. S. Department of Energy               */
-/*                                                              */
-/*            See COPYRIGHT for full restrictions               */
-/****************************************************************/
+//* This file is part of the MOOSE framework
+//* https://www.mooseframework.org
+//*
+//* All rights reserved, see COPYRIGHT for full restrictions
+//* https://github.com/idaholab/moose/blob/master/COPYRIGHT
+//*
+//* Licensed under LGPL 2.1, please see LICENSE for details
+//* https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "TaggingInterface.h"
 #include "Conversion.h"
@@ -147,6 +142,19 @@ TaggingInterface::prepareVectorTagNeighbor(Assembly & assembly, unsigned int iva
 }
 
 void
+TaggingInterface::prepareVectorTagLower(Assembly & assembly, unsigned int ivar)
+{
+  _re_blocks.resize(_vector_tags.size());
+  mooseAssert(_vector_tags.size() >= 1, "we need at least one active tag");
+  auto vector_tag = _vector_tags.begin();
+  for (MooseIndex(_vector_tags) i = 0; i < _vector_tags.size(); i++, ++vector_tag)
+    _re_blocks[i] = &assembly.residualBlockLower(ivar, *vector_tag);
+
+  _local_re.resize(_re_blocks[0]->size());
+  _local_re.zero();
+}
+
+void
 TaggingInterface::prepareMatrixTag(Assembly & assembly, unsigned int ivar, unsigned int jvar)
 {
   _ke_blocks.resize(_matrix_tags.size());
@@ -170,6 +178,22 @@ TaggingInterface::prepareMatrixTagNeighbor(Assembly & assembly,
   auto mat_vector = _matrix_tags.begin();
   for (MooseIndex(_matrix_tags) i = 0; i < _matrix_tags.size(); i++, ++mat_vector)
     _ke_blocks[i] = &assembly.jacobianBlockNeighbor(type, ivar, jvar, *mat_vector);
+
+  _local_ke.resize(_ke_blocks[0]->m(), _ke_blocks[0]->n());
+  _local_ke.zero();
+}
+
+void
+TaggingInterface::prepareMatrixTagLower(Assembly & assembly,
+                                        unsigned int ivar,
+                                        unsigned int jvar,
+                                        Moose::ConstraintJacobianType type)
+{
+  _ke_blocks.resize(_matrix_tags.size());
+  mooseAssert(_matrix_tags.size() >= 1, "we need at least one active tag");
+  auto mat_vector = _matrix_tags.begin();
+  for (MooseIndex(_matrix_tags) i = 0; i < _matrix_tags.size(); i++, ++mat_vector)
+    _ke_blocks[i] = &assembly.jacobianBlockLower(type, ivar, jvar, *mat_vector);
 
   _local_ke.resize(_ke_blocks[0]->m(), _ke_blocks[0]->n());
   _local_ke.zero();

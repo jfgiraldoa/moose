@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef FUNCTIONPRESETBC_H
-#define FUNCTIONPRESETBC_H
+#pragma once
 
 #include "PresetNodalBC.h"
 
@@ -35,7 +34,5 @@ protected:
   virtual Real computeQpValue() override;
 
   /// Function being used for evaluation of this BC
-  Function & _func;
+  const Function & _func;
 };
-
-#endif // FUNCTIONPRESETBC_H

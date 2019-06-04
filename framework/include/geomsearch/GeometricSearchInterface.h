@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef GEOMETRICSEARCHINTERFACE_H
-#define GEOMETRICSEARCHINTERFACE_H
+#pragma once
 
 #include "MooseTypes.h"
 
@@ -43,17 +42,6 @@ public:
                                                        Order order);
 
   /**
-   * Retrieve the mortar PentrationLocator associated with the two sides.
-   *
-   * A mortar version means that it's going to find the penetration each quadrature point on this
-   * boundary
-   */
-  PenetrationLocator & getMortarPenetrationLocator(const BoundaryName & master,
-                                                   const BoundaryName & slave,
-                                                   Moose::ConstraintType side_type,
-                                                   Order order);
-
-  /**
    * Retrieve the PentrationLocator associated with the two sides.
    */
   NearestNodeLocator & getNearestNodeLocator(const BoundaryName & master,
@@ -68,18 +56,7 @@ public:
   NearestNodeLocator & getQuadratureNearestNodeLocator(const BoundaryName & master,
                                                        const BoundaryName & slave);
 
-  /**
-   * Retrieve a mortar NearestNodeLocator associated with the two sides.
-   *
-   * A mortar version means that it's going to find the nearest nodes to each quadrature point on
-   * this boundary
-   */
-  NearestNodeLocator & getMortarNearestNodeLocator(const BoundaryName & master,
-                                                   const BoundaryName & slave,
-                                                   Moose::ConstraintType side_type);
-
 protected:
   GeometricSearchData & _geometric_search_data;
 };
 
-#endif // GEOMETRICSEARCHINTERFACE_H

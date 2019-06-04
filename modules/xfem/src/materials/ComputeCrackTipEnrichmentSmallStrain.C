@@ -86,7 +86,7 @@ ComputeCrackTipEnrichmentSmallStrain::computeQpProperties()
     _grad_enrich_disp[m].zero();
     for (unsigned int i = 0; i < _current_elem->n_nodes(); ++i)
     {
-      Node * node_i = _current_elem->get_node(i);
+      const Node * node_i = _current_elem->node_ptr(i);
       for (unsigned int j = 0; j < 4; ++j)
       {
         dof_id_type dof = node_i->dof_number(_nl->number(), _enrich_variable[j][m]->number(), 0);
@@ -124,7 +124,7 @@ ComputeCrackTipEnrichmentSmallStrain::computeProperties()
                  Utility::string_to_enum<FEFamily>("lagrange"));
   const unsigned int dim = _current_elem->dim();
   std::unique_ptr<FEBase> fe(FEBase::build(dim, fe_type));
-  fe->attach_quadrature_rule(_qrule);
+  fe->attach_quadrature_rule(const_cast<QBase *>(_qrule));
   _fe_phi = &(fe->get_phi());
   _fe_dphi = &(fe->get_dphi());
 
@@ -134,7 +134,7 @@ ComputeCrackTipEnrichmentSmallStrain::computeProperties()
     fe->reinit(_current_elem);
 
   for (unsigned int i = 0; i < _BI.size(); ++i)
-    crackTipEnrichementFunctionAtPoint(*(_current_elem->get_node(i)), _BI[i]);
+    crackTipEnrichementFunctionAtPoint(*(_current_elem->node_ptr(i)), _BI[i]);
 
   ComputeStrainBase::computeProperties();
 }

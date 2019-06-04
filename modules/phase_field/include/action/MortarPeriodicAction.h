@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MORTARPERIODICACTION_H
-#define MORTARPERIODICACTION_H
+#pragma once
 
 #include "Action.h"
 
@@ -33,6 +32,8 @@ protected:
 
   // type of the periodic constraint to apply (value, gradient)
   const unsigned int _periodicity;
+
+  // the periodic directions
+  const MultiMooseEnum _periodic_directions;
 };
 
-#endif // MORTARPERIODICACTION_H

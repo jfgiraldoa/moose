@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef BREAKBOUNDARYONSUBDOMAINGENERATOR_H
-#define BREAKBOUNDARYONSUBDOMAINGENERATOR_H
+#pragma once
 
 #include "MeshGenerator.h"
 
@@ -26,10 +25,9 @@ class BreakBoundaryOnSubdomainGenerator : public MeshGenerator
 public:
   BreakBoundaryOnSubdomainGenerator(const InputParameters & parameters);
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   std::unique_ptr<MeshBase> & _input;
 };
 
-#endif // BREAKBOUNDARYONSUBDOMAINGENERATOR_H

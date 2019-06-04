@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PARSEDGENERATESIDESET_H
-#define PARSEDGENERATESIDESET_H
+#pragma once
 
 #include "SideSetsGeneratorBase.h"
 #include "FunctionParserUtils.h"
@@ -30,7 +29,7 @@ class ParsedGenerateSideset : public SideSetsGeneratorBase, public FunctionParse
 public:
   ParsedGenerateSideset(const InputParameters & parameters);
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   std::unique_ptr<MeshBase> & _input;
@@ -57,4 +56,3 @@ protected:
   ADFunctionPtr _func_F;
 };
 
-#endif // PARSEDGENERATESIDESET_H

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef CONVECTIVEFLUXFUNCTION_H
-#define CONVECTIVEFLUXFUNCTION_H
+#pragma once
 
 #include "IntegratedBC.h"
 
@@ -22,12 +21,10 @@ protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
 
-  Function & _T_infinity;
+  const Function & _T_infinity;
   const Real _coefficient;
-  Function * const _coef_func;
+  const Function * const _coef_func;
 };
 
 template <>
 InputParameters validParams<ConvectiveFluxFunction>();
-
-#endif // CONVECTIVEFLUXFUNCTION_H

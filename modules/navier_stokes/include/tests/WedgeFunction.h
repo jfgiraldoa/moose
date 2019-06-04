@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef WEDGEFUNCTION_H
-#define WEDGEFUNCTION_H
+#pragma once
 
 #include "Function.h"
 #include "FunctionInterface.h"
@@ -33,7 +32,7 @@ class WedgeFunction : public Function, protected FunctionInterface
 public:
   WedgeFunction(const InputParameters & parameters);
 
-  virtual Real value(Real t, const Point & p) override;
+  virtual Real value(Real t, const Point & p) const override;
 
 protected:
   /// The half-angle of the wedge, stored in radians.
@@ -86,7 +85,5 @@ protected:
    * The pre-computed semi-analytic exact solution f(theta) as a
    * PiecewiseLinear function.
    */
-  Function & _f;
+  const Function & _f;
 };
-
-#endif

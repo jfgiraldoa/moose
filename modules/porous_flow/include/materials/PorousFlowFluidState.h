@@ -7,11 +7,10 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef POROUSFLOWFLUIDSTATE_H
-#define POROUSFLOWFLUIDSTATE_H
+#pragma once
 
 #include "PorousFlowVariableBase.h"
-#include "PorousFlowFluidStateBase.h"
+#include "PorousFlowFluidStateMultiComponentBase.h"
 
 class PorousFlowFluidState;
 class PorousFlowCapillaryPressure;
@@ -62,7 +61,7 @@ protected:
 
   /**
    * Calculates all required thermophysical properties and derivatives for each phase
-   * and fluid component. Must override in all derived classes.
+   * and fluid component
    */
   virtual void thermophysicalProperties();
 
@@ -93,7 +92,7 @@ protected:
   /// Salt mass fraction PorousFlow variable number
   const unsigned int _Xvar;
   /// FluidState UserObject
-  const PorousFlowFluidStateBase & _fs;
+  const PorousFlowFluidStateMultiComponentBase & _fs;
   /// Phase number of the aqueous phase
   const unsigned int _aqueous_phase_number;
   /// Phase number of the gas phase
@@ -142,4 +141,3 @@ protected:
   const PorousFlowCapillaryPressure & _pc;
 };
 
-#endif // POROUSFLOWFLUIDSTATE_H

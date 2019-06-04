@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef DIFFTENSORKERNEL_H
-#define DIFFTENSORKERNEL_H
+#pragma once
 
 #include "Kernel.h"
 #include "MooseParsedVectorFunction.h"
@@ -38,11 +37,9 @@ protected:
   virtual Real computeQpJacobian();
 
   /// A vector function containing the components of k for the tensor
-  Function & _k_comp;
+  const Function & _k_comp;
 
 private:
   /** Compute the k Tensor from the vector function input */
   RealTensorValue computeConductivity(Real t, const Point & pt);
 };
-
-#endif // DIFFTENSORKERNEL_H

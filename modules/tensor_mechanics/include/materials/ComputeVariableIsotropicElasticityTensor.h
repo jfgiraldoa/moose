@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef COMPUTEVARIABLEISOTROPICELASTICITYTENSOR_H
-#define COMPUTEVARIABLEISOTROPICELASTICITYTENSOR_H
+#pragma once
 
 #include "ComputeElasticityTensorBase.h"
 
@@ -32,10 +31,10 @@ protected:
   virtual void initQpStatefulProperties() override;
   virtual void computeQpElasticityTensor() override;
 
-  /// Material defininig the Young's Modulus
+  /// Material defining the Young's Modulus
   const MaterialProperty<Real> & _youngs_modulus;
 
-  /// Material defininig the Poisson's Ratio
+  /// Material defining the Poisson's Ratio
   const MaterialProperty<Real> & _poissons_ratio;
 
   /// number of variables the moduli depend on
@@ -60,4 +59,3 @@ protected:
   std::vector<Real> _isotropic_elastic_constants;
 };
 
-#endif // COMPUTEVARIABLEISOTROPICELASTICITYTENSOR_H

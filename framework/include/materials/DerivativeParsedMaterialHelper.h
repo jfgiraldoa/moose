@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef DERIVATIVEPARSEDMATERIALHELPER_H
-#define DERIVATIVEPARSEDMATERIALHELPER_H
+#pragma once
 
 #include "DerivativeFunctionMaterialBase.h"
 #include "ParsedMaterialHelper.h"
@@ -30,7 +29,8 @@ public:
                                  VariableNameMappingMode map_mode = USE_PARAM_NAMES);
 
 protected:
-  virtual void computeProperties();
+  virtual void initQpStatefulProperties();
+  virtual void computeQpProperties();
 
   virtual void functionsPostParse();
   void assembleDerivatives();
@@ -69,4 +69,3 @@ struct DerivativeParsedMaterialHelper::Derivative
   std::vector<VariableName> darg_names;
 };
 
-#endif // DERIVATIVEPARSEDMATERIALHELPER_H

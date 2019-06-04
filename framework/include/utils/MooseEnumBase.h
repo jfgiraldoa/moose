@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MOOSEENUMBASE_H
-#define MOOSEENUMBASE_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -85,7 +84,7 @@ public:
   /**
    * Return the complete set of available flags.
    */
-  const std::set<MooseEnumItem> & items() { return _items; }
+  const std::set<MooseEnumItem> & items() const { return _items; }
 
   ///@{
   /**
@@ -138,5 +137,3 @@ protected:
   /// Flag to enable enumeration items not previously defined
   bool _allow_out_of_range;
 };
-
-#endif // MOOSEENUMBASE_H

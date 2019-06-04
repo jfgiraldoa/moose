@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ACTIONWAREHOUSE_H
-#define ACTIONWAREHOUSE_H
+#pragma once
 
 #include <string>
 #include <set>
@@ -212,7 +211,10 @@ public:
   // this context.  Since full support for unique_ptr is not quite
   // available yet, we've implemented it as a std::shared_ptr.
   std::shared_ptr<MooseMesh> & mesh() { return _mesh; }
+  const std::shared_ptr<MooseMesh> & getMesh() const { return _mesh; }
+
   std::shared_ptr<MooseMesh> & displacedMesh() { return _displaced_mesh; }
+  const std::shared_ptr<MooseMesh> & getDisplacedMesh() const { return _displaced_mesh; }
 
   std::shared_ptr<FEProblemBase> & problemBase() { return _problem; }
   std::shared_ptr<FEProblem> problem();
@@ -284,5 +286,3 @@ private:
 
   const std::list<Action *> _empty_action_list;
 };
-
-#endif // ACTIONWAREHOUSE_H

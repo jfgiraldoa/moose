@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef VECTORCURLPENALTYDIRICHLETBC_H
-#define VECTORCURLPENALTYDIRICHLETBC_H
+#pragma once
 
 #include "VectorIntegratedBC.h"
 
@@ -26,9 +25,8 @@ protected:
   Real _penalty;
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
-  Function & _exact_x;
-  Function & _exact_y;
-  Function & _exact_z;
+  const Function * _function;
+  const Function & _function_x;
+  const Function & _function_y;
+  const Function & _function_z;
 };
-
-#endif // VECTORCURLPENALTYDIRICHLETBC_H

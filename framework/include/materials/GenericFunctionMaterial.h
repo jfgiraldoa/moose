@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef GENERICFUNCTIONMATERIAL_H
-#define GENERICFUNCTIONMATERIAL_H
+#pragma once
 
 #include "Material.h"
 
@@ -43,7 +42,7 @@ protected:
   std::vector<MaterialProperty<Real> *> _properties;
   std::vector<const MaterialProperty<Real> *> _properties_old;
   std::vector<const MaterialProperty<Real> *> _properties_older;
-  std::vector<Function *> _functions;
+  std::vector<const Function *> _functions;
 
 private:
   /**
@@ -54,5 +53,3 @@ private:
   /// Flag for calling declareProperyOld/Older
   bool _enable_stateful;
 };
-
-#endif // GENERICFUNCTIONMATERIAL_H

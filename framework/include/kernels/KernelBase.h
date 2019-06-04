@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef KERNELBASE_H
-#define KERNELBASE_H
+#pragma once
 
 #include "MooseObject.h"
 #include "BlockRestrictable.h"
@@ -142,7 +141,7 @@ protected:
   /// Reference to this Kernel's mesh object
   MooseMesh & _mesh;
 
-  const Elem *& _current_elem;
+  const Elem * const & _current_elem;
 
   /// Volume of the current element
   const Real & _current_elem_volume;
@@ -154,7 +153,7 @@ protected:
   const MooseArray<Point> & _q_point;
 
   /// active quadrature rule
-  QBase *& _qrule;
+  const QBase * const & _qrule;
 
   /// The current quadrature point weight value
   const MooseArray<Real> & _JxW;
@@ -181,4 +180,3 @@ protected:
   std::vector<unsigned int> _displacements;
 };
 
-#endif /* KERNELBASE_H */

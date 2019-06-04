@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PIECEWISELINEARINTERPOLATIONMATERIAL_H
-#define PIECEWISELINEARINTERPOLATIONMATERIAL_H
+#pragma once
 
 #include "Material.h"
 #include "LinearInterpolation.h"
@@ -42,12 +41,11 @@ protected:
   const Real _scale_factor;
 
   /// Material property to be calculated
-  MaterialProperty<Real> * _property;
+  MaterialProperty<Real> & _property;
   /// First derivative of the material property wrt the coupled variable
-  MaterialProperty<Real> * _dproperty;
+  MaterialProperty<Real> & _dproperty;
 
   /// LinearInterpolation object
   std::unique_ptr<LinearInterpolation> _linear_interp;
 };
 
-#endif // PIECEWISELINEARINTERPOLATIONMATERIAL_H

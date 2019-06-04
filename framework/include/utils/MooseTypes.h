@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MOOSETYPES_H
-#define MOOSETYPES_H
+#pragma once
 
 #include "Moose.h"
 #include "DualReal.h"
@@ -194,35 +193,33 @@ struct OutputTools
   typedef MooseArray<std::vector<OutputDivergence>> VariableTestDivergence;
 };
 
-typedef MooseArray<Real> VariableValue;
-typedef MooseArray<libMesh::VectorValue<Real>> VariableGradient;
-typedef MooseArray<libMesh::TensorValue<Real>> VariableSecond;
-typedef MooseArray<Real> VariableCurl;
+// types for standard variable
+typedef typename OutputTools<Real>::VariableValue VariableValue;
+typedef typename OutputTools<Real>::VariableGradient VariableGradient;
+typedef typename OutputTools<Real>::VariableSecond VariableSecond;
+typedef typename OutputTools<Real>::VariableCurl VariableCurl;
+typedef typename OutputTools<Real>::VariablePhiValue VariablePhiValue;
+typedef typename OutputTools<Real>::VariablePhiGradient VariablePhiGradient;
+typedef typename OutputTools<Real>::VariablePhiSecond VariablePhiSecond;
+typedef typename OutputTools<Real>::VariablePhiCurl VariablePhiCurl;
+typedef typename OutputTools<Real>::VariableTestValue VariableTestValue;
+typedef typename OutputTools<Real>::VariableTestGradient VariableTestGradient;
+typedef typename OutputTools<Real>::VariableTestSecond VariableTestSecond;
+typedef typename OutputTools<Real>::VariableTestCurl VariableTestCurl;
 
-typedef MooseArray<std::vector<Real>> VariablePhiValue;
-typedef MooseArray<std::vector<libMesh::VectorValue<Real>>> VariablePhiGradient;
-typedef MooseArray<std::vector<libMesh::TensorValue<Real>>> VariablePhiSecond;
-typedef MooseArray<std::vector<Real>> VariablePhiCurl;
-
-typedef MooseArray<std::vector<Real>> VariableTestValue;
-typedef MooseArray<std::vector<libMesh::VectorValue<Real>>> VariableTestGradient;
-typedef MooseArray<std::vector<libMesh::TensorValue<Real>>> VariableTestSecond;
-typedef MooseArray<std::vector<Real>> VariableTestCurl;
-
-typedef MooseArray<libMesh::VectorValue<Real>> VectorVariableValue;
-typedef MooseArray<libMesh::TensorValue<Real>> VectorVariableGradient;
-typedef MooseArray<libMesh::TypeNTensor<3, Real>> VectorVariableSecond;
-typedef MooseArray<libMesh::VectorValue<Real>> VectorVariableCurl;
-
-typedef MooseArray<std::vector<libMesh::VectorValue<Real>>> VectorVariablePhiValue;
-typedef MooseArray<std::vector<libMesh::TensorValue<Real>>> VectorVariablePhiGradient;
-typedef MooseArray<std::vector<libMesh::TypeNTensor<3, Real>>> VectorVariablePhiSecond;
-typedef MooseArray<std::vector<libMesh::VectorValue<Real>>> VectorVariablePhiCurl;
-
-typedef MooseArray<std::vector<libMesh::VectorValue<Real>>> VectorVariableTestValue;
-typedef MooseArray<std::vector<libMesh::TensorValue<Real>>> VectorVariableTestGradient;
-typedef MooseArray<std::vector<libMesh::TypeNTensor<3, Real>>> VectorVariableTestSecond;
-typedef MooseArray<std::vector<libMesh::VectorValue<Real>>> VectorVariableTestCurl;
+// types for vector variable
+typedef typename OutputTools<RealVectorValue>::VariableValue VectorVariableValue;
+typedef typename OutputTools<RealVectorValue>::VariableGradient VectorVariableGradient;
+typedef typename OutputTools<RealVectorValue>::VariableSecond VectorVariableSecond;
+typedef typename OutputTools<RealVectorValue>::VariableCurl VectorVariableCurl;
+typedef typename OutputTools<RealVectorValue>::VariablePhiValue VectorVariablePhiValue;
+typedef typename OutputTools<RealVectorValue>::VariablePhiGradient VectorVariablePhiGradient;
+typedef typename OutputTools<RealVectorValue>::VariablePhiSecond VectorVariablePhiSecond;
+typedef typename OutputTools<RealVectorValue>::VariablePhiCurl VectorVariablePhiCurl;
+typedef typename OutputTools<RealVectorValue>::VariableTestValue VectorVariableTestValue;
+typedef typename OutputTools<RealVectorValue>::VariableTestGradient VectorVariableTestGradient;
+typedef typename OutputTools<RealVectorValue>::VariableTestSecond VectorVariableTestSecond;
+typedef typename OutputTools<RealVectorValue>::VariableTestCurl VectorVariableTestCurl;
 
 template <template <class> class W>
 using TemplateDN = W<DualReal>;
@@ -529,12 +526,31 @@ enum ConstraintType
   Master = Neighbor
 };
 
+enum class ElementType : unsigned int
+{
+  Element = DGResidualType::Element,
+  Neighbor = DGResidualType::Neighbor,
+  Lower = DGResidualType::Neighbor + 1
+};
+
+enum class MortarType : unsigned int
+{
+  Slave = static_cast<unsigned int>(Moose::ElementType::Element),
+  Master = static_cast<unsigned int>(Moose::ElementType::Neighbor),
+  Lower = static_cast<unsigned int>(Moose::ElementType::Lower)
+};
+
 enum ConstraintJacobianType
 {
   SlaveSlave = ElementElement,
   SlaveMaster = ElementNeighbor,
   MasterSlave = NeighborElement,
-  MasterMaster = NeighborNeighbor
+  MasterMaster = NeighborNeighbor,
+  LowerLower,
+  LowerSlave,
+  LowerMaster,
+  SlaveLower,
+  MasterLower
 };
 
 enum CoordinateSystemType
@@ -824,4 +840,3 @@ DerivativeStringClass(TagName);
 /// Name of MeshGenerators
 DerivativeStringClass(MeshGeneratorName);
 
-#endif // MOOSETYPES_H

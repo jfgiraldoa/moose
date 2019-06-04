@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef DGMDDBC_H
-#define DGMDDBC_H
+#pragma once
 
 #include "IntegratedBC.h"
 
@@ -44,12 +43,10 @@ protected:
   virtual Real computeQpJacobian();
 
 private:
-  Function & _func;
+  const Function & _func;
 
   const MaterialProperty<Real> & _diff; // diffusivity
 
   Real _epsilon;
   Real _sigma;
 };
-
-#endif // DGMDDBC_H

@@ -7,10 +7,9 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef POLYCRYSTALRANDOMIC_H
-#define POLYCRYSTALRANDOMIC_H
+#pragma once
 
-#include "InitialCondition.h"
+#include "RandomICBase.h"
 
 // Forward Declarations
 class PolycrystalRandomIC;
@@ -21,7 +20,7 @@ InputParameters validParams<PolycrystalRandomIC>();
 /**
  * Random initial condition for a polycrystalline material
  */
-class PolycrystalRandomIC : public InitialCondition
+class PolycrystalRandomIC : public RandomICBase
 {
 public:
   PolycrystalRandomIC(const InputParameters & parameters);
@@ -33,5 +32,3 @@ private:
   const unsigned int _op_index;
   const unsigned int _random_type;
 };
-
-#endif // POLYCRYSTALRANDOMIC_H

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PIECEWISEMULTILINEAR_H
-#define PIECEWISEMULTILINEAR_H
+#pragma once
 
 #include "PiecewiseMultiInterpolation.h"
 
@@ -33,7 +32,5 @@ public:
   PiecewiseMultilinear(const InputParameters & parameters);
 
 protected:
-  virtual Real sample(const std::vector<Real> & pt) override;
+  virtual Real sample(const std::vector<Real> & pt) const override;
 };
-
-#endif // PIECEWISEMULTILINEAR_H

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MOOSEUTILS_H
-#define MOOSEUTILS_H
+#pragma once
 
 // MOOSE includes
 #include "HashMap.h"
@@ -18,6 +17,7 @@
 #include "Moose.h"
 
 #include "libmesh/compare_types.h"
+#include "metaphysicl/raw_type.h"
 
 // C++ includes
 #include <string>
@@ -232,7 +232,8 @@ absoluteFuzzyEqual(const T & var1,
                    const T2 & var2,
                    const T3 & tol = libMesh::TOLERANCE * libMesh::TOLERANCE)
 {
-  return (std::abs(var1 - var2) <= tol);
+  return (std::abs(MetaPhysicL::raw_value(var1) - MetaPhysicL::raw_value(var2)) <=
+          MetaPhysicL::raw_value(tol));
 }
 
 /**
@@ -243,9 +244,20 @@ absoluteFuzzyEqual(const T & var1,
  * @param tol The tolerance to be used
  * @return true if var1 > var2 or var1 == var2 within tol
  */
-bool absoluteFuzzyGreaterEqual(const libMesh::Real & var1,
-                               const libMesh::Real & var2,
-                               const libMesh::Real & tol = libMesh::TOLERANCE * libMesh::TOLERANCE);
+template <typename T,
+          typename T2,
+          typename T3 = T,
+          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value &&
+                                      ScalarTraits<T3>::value,
+                                  int>::type = 0>
+bool
+absoluteFuzzyGreaterEqual(const T & var1,
+                          const T2 & var2,
+                          const T3 & tol = libMesh::TOLERANCE * libMesh::TOLERANCE)
+{
+  return (MetaPhysicL::raw_value(var1) >=
+          (MetaPhysicL::raw_value(var2) - MetaPhysicL::raw_value(tol)));
+}
 
 /**
  * Function to check whether a variable is greater than another variable within an absolute
@@ -255,9 +267,20 @@ bool absoluteFuzzyGreaterEqual(const libMesh::Real & var1,
  * @param tol The tolerance to be used
  * @return true if var1 > var2 and var1 != var2 within tol
  */
-bool absoluteFuzzyGreaterThan(const libMesh::Real & var1,
-                              const libMesh::Real & var2,
-                              const libMesh::Real & tol = libMesh::TOLERANCE * libMesh::TOLERANCE);
+template <typename T,
+          typename T2,
+          typename T3 = T,
+          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value &&
+                                      ScalarTraits<T3>::value,
+                                  int>::type = 0>
+bool
+absoluteFuzzyGreaterThan(const T & var1,
+                         const T2 & var2,
+                         const T3 & tol = libMesh::TOLERANCE * libMesh::TOLERANCE)
+{
+  return (MetaPhysicL::raw_value(var1) >
+          (MetaPhysicL::raw_value(var2) + MetaPhysicL::raw_value(tol)));
+}
 
 /**
  * Function to check whether a variable is less than or equal to another variable within an absolute
@@ -267,9 +290,20 @@ bool absoluteFuzzyGreaterThan(const libMesh::Real & var1,
  * @param tol The tolerance to be used
  * @return true if var1 < var2 or var1 == var2 within tol
  */
-bool absoluteFuzzyLessEqual(const libMesh::Real & var1,
-                            const libMesh::Real & var2,
-                            const libMesh::Real & tol = libMesh::TOLERANCE * libMesh::TOLERANCE);
+template <typename T,
+          typename T2,
+          typename T3 = T,
+          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value &&
+                                      ScalarTraits<T3>::value,
+                                  int>::type = 0>
+bool
+absoluteFuzzyLessEqual(const T & var1,
+                       const T2 & var2,
+                       const T3 & tol = libMesh::TOLERANCE * libMesh::TOLERANCE)
+{
+  return (MetaPhysicL::raw_value(var1) <=
+          (MetaPhysicL::raw_value(var2) + MetaPhysicL::raw_value(tol)));
+}
 
 /**
  * Function to check whether a variable is less than another variable within an absolute tolerance
@@ -278,9 +312,20 @@ bool absoluteFuzzyLessEqual(const libMesh::Real & var1,
  * @param tol The tolerance to be used
  * @return true if var1 < var2 and var1 != var2 within tol
  */
-bool absoluteFuzzyLessThan(const libMesh::Real & var1,
-                           const libMesh::Real & var2,
-                           const libMesh::Real & tol = libMesh::TOLERANCE * libMesh::TOLERANCE);
+template <typename T,
+          typename T2,
+          typename T3 = T,
+          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value &&
+                                      ScalarTraits<T3>::value,
+                                  int>::type = 0>
+bool
+absoluteFuzzyLessThan(const T & var1,
+                      const T2 & var2,
+                      const T3 & tol = libMesh::TOLERANCE * libMesh::TOLERANCE)
+{
+  return (MetaPhysicL::raw_value(var1) <
+          (MetaPhysicL::raw_value(var2) - MetaPhysicL::raw_value(tol)));
+}
 
 /**
  * Function to check whether two variables are equal within a relative tolerance
@@ -291,13 +336,19 @@ bool absoluteFuzzyLessThan(const libMesh::Real & var1,
  */
 template <typename T,
           typename T2,
-          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value, int>::type = 0>
+          typename T3 = T,
+          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value &&
+                                      ScalarTraits<T3>::value,
+                                  int>::type = 0>
 bool
 relativeFuzzyEqual(const T & var1,
                    const T2 & var2,
-                   const Real & tol = libMesh::TOLERANCE * libMesh::TOLERANCE)
+                   const T3 & tol = libMesh::TOLERANCE * libMesh::TOLERANCE)
 {
-  return (absoluteFuzzyEqual(var1, var2, tol * (std::abs(var1) + std::abs(var2))));
+  return (absoluteFuzzyEqual(
+      var1,
+      var2,
+      tol * (std::abs(MetaPhysicL::raw_value(var1)) + std::abs(MetaPhysicL::raw_value(var2)))));
 }
 
 /**
@@ -308,9 +359,22 @@ relativeFuzzyEqual(const T & var1,
  * @param tol The tolerance to be used
  * @return true if var1 > var2 or var1 == var2 within relative tol
  */
-bool relativeFuzzyGreaterEqual(const libMesh::Real & var1,
-                               const libMesh::Real & var2,
-                               const libMesh::Real & tol = libMesh::TOLERANCE * libMesh::TOLERANCE);
+template <typename T,
+          typename T2,
+          typename T3 = T,
+          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value &&
+                                      ScalarTraits<T3>::value,
+                                  int>::type = 0>
+bool
+relativeFuzzyGreaterEqual(const T & var1,
+                          const T2 & var2,
+                          const T3 & tol = libMesh::TOLERANCE * libMesh::TOLERANCE)
+{
+  return (absoluteFuzzyGreaterEqual(
+      var1,
+      var2,
+      tol * (std::abs(MetaPhysicL::raw_value(var1)) + std::abs(MetaPhysicL::raw_value(var2)))));
+}
 
 /**
  * Function to check whether a variable is greater than another variable within a relative tolerance
@@ -319,9 +383,22 @@ bool relativeFuzzyGreaterEqual(const libMesh::Real & var1,
  * @param tol The tolerance to be used
  * @return true if var1 > var2 and var1 != var2 within relative tol
  */
-bool relativeFuzzyGreaterThan(const libMesh::Real & var1,
-                              const libMesh::Real & var2,
-                              const libMesh::Real & tol = libMesh::TOLERANCE * libMesh::TOLERANCE);
+template <typename T,
+          typename T2,
+          typename T3 = T,
+          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value &&
+                                      ScalarTraits<T3>::value,
+                                  int>::type = 0>
+bool
+relativeFuzzyGreaterThan(const T & var1,
+                         const T2 & var2,
+                         const T3 & tol = libMesh::TOLERANCE * libMesh::TOLERANCE)
+{
+  return (absoluteFuzzyGreaterThan(
+      var1,
+      var2,
+      tol * (std::abs(MetaPhysicL::raw_value(var1)) + std::abs(MetaPhysicL::raw_value(var2)))));
+}
 
 /**
  * Function to check whether a variable is less than or equal to another variable within a relative
@@ -331,9 +408,22 @@ bool relativeFuzzyGreaterThan(const libMesh::Real & var1,
  * @param tol The tolerance to be used
  * @return true if var1 < var2 or var1 == var2 within relative tol
  */
-bool relativeFuzzyLessEqual(const libMesh::Real & var1,
-                            const libMesh::Real & var2,
-                            const libMesh::Real & tol = libMesh::TOLERANCE * libMesh::TOLERANCE);
+template <typename T,
+          typename T2,
+          typename T3 = T,
+          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value &&
+                                      ScalarTraits<T3>::value,
+                                  int>::type = 0>
+bool
+relativeFuzzyLessEqual(const T & var1,
+                       const T2 & var2,
+                       const T3 & tol = libMesh::TOLERANCE * libMesh::TOLERANCE)
+{
+  return (absoluteFuzzyLessEqual(
+      var1,
+      var2,
+      tol * (std::abs(MetaPhysicL::raw_value(var1)) + std::abs(MetaPhysicL::raw_value(var2)))));
+}
 
 /**
  * Function to check whether a variable is less than another variable within a relative tolerance
@@ -342,9 +432,22 @@ bool relativeFuzzyLessEqual(const libMesh::Real & var1,
  * @param tol The tolerance to be used
  * @return true if var1 < var2 and var1 != var2 within relative tol
  */
-bool relativeFuzzyLessThan(const libMesh::Real & var1,
-                           const libMesh::Real & var2,
-                           const libMesh::Real & tol = libMesh::TOLERANCE * libMesh::TOLERANCE);
+template <typename T,
+          typename T2,
+          typename T3 = T,
+          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value &&
+                                      ScalarTraits<T3>::value,
+                                  int>::type = 0>
+bool
+relativeFuzzyLessThan(const T & var1,
+                      const T2 & var2,
+                      const T3 & tol = libMesh::TOLERANCE * libMesh::TOLERANCE)
+{
+  return (absoluteFuzzyLessThan(
+      var1,
+      var2,
+      tol * (std::abs(MetaPhysicL::raw_value(var1)) + std::abs(MetaPhysicL::raw_value(var2)))));
+}
 
 /**
  * Function to dump the contents of MaterialPropertyStorage for debugging purposes
@@ -639,5 +742,3 @@ linearPartitionChunk(dof_id_type num_items, dof_id_type num_chunks, dof_id_type 
  * find, erase, length algorithm for removing a substring from a string
  */
 void removeSubstring(std::string & main, const std::string & sub);
-
-#endif // MOOSEUTILS_H

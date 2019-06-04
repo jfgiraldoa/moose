@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef POLYCRYSTALCIRCLES_H
-#define POLYCRYSTALCIRCLES_H
+#pragma once
 
 #include <array>
 #include "PolycrystalUserObjectBase.h"
@@ -26,7 +25,7 @@ InputParameters validParams<PolycrystalCircles>();
  * through a user input or by reading a .txt file.
  * The file is expected to have a one-line header labeling the
  * colums 'x y z r'.
-**/
+ **/
 
 class PolycrystalCircles : public PolycrystalUserObjectBase
 {
@@ -48,11 +47,20 @@ protected:
     Z,
     R
   }; // Names of columns in text file.
+  /// Whether to use columns or spheres in 3D geometries
   const bool _columnar_3D;
-  unsigned int _grain_num; // Number of crystal grains to create
 
-  std::vector<Point> _centerpoints; // x,y,z coordinates of circle centers
-  std::vector<Real> _radii;         // Radius for each circular grain created
+  /// Interfacial width
+  const Real _int_width;
+
+  /// Number of crystal grains to create
+  unsigned int _grain_num;
+
+  /// x,y,z coordinates of circle centers
+  std::vector<Point> _centerpoints;
+
+  /// Radius for each circular grain created
+  std::vector<Real> _radii;
+
+  Real computeDiffuseInterface(const Point & p, const unsigned int & i) const;
 };
-
-#endif // POLYCRYSTALCIRCLES_H

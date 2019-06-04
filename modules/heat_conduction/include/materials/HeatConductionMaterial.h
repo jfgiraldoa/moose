@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef HEATCONDUCTIONMATERIAL_H
-#define HEATCONDUCTIONMATERIAL_H
+#pragma once
 
 #include "Material.h"
 
@@ -38,10 +37,8 @@ protected:
 
   MaterialProperty<Real> & _thermal_conductivity;
   MaterialProperty<Real> & _thermal_conductivity_dT;
-  Function * _thermal_conductivity_temperature_function;
+  const Function * _thermal_conductivity_temperature_function;
 
   MaterialProperty<Real> & _specific_heat;
-  Function * _specific_heat_temperature_function;
+  const Function * _specific_heat_temperature_function;
 };
-
-#endif // HEATCONDUCTIONMATERIAL_H

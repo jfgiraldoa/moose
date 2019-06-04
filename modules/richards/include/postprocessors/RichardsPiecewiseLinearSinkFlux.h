@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef RICHARDSPIECEWISELINEARSINKFLUX_H
-#define RICHARDSPIECEWISELINEARSINKFLUX_H
+#pragma once
 
 #include "SideIntegralVariablePostprocessor.h"
 #include "LinearInterpolation.h"
@@ -49,7 +48,7 @@ protected:
   bool _use_relperm;
 
   /// the multiplier function
-  Function & _m_func;
+  const Function & _m_func;
 
   /// holds info regarding the Richards variable names, and their values in the simulation
   const RichardsVarNames & _richards_name_UO;
@@ -76,5 +75,3 @@ protected:
   /// fluid density
   const MaterialProperty<std::vector<Real>> & _density;
 };
-
-#endif

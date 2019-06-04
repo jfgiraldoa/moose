@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef INTERNALVOLUME_H
-#define INTERNALVOLUME_H
+#pragma once
 
 #include "SideIntegralPostprocessor.h"
 
@@ -41,7 +40,5 @@ protected:
 
   const unsigned int _component;
   const Real _scale;
-  Function & _addition;
+  const Function & _addition;
 };
-
-#endif // INTERNALVOLUME_H

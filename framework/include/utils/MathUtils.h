@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MATHUTILS_H
-#define MATHUTILS_H
+#pragma once
 
 #include "Moose.h"
 #include "libmesh/libmesh.h"
@@ -131,6 +130,35 @@ poly(std::vector<Real> c, const T x, const bool derivative)
   return value;
 }
 
-} // namespace MathUtils
+template <typename T>
+T
+clamp(const T & x, Real lowerlimit, Real upperlimit)
+{
+  if (x < lowerlimit)
+    return lowerlimit;
+  if (x > upperlimit)
+    return upperlimit;
+  return x;
+}
 
-#endif // MATHUTILS_H
+template <typename T>
+T
+smootherStep(T x, T start, T end, bool derivative = false)
+{
+  if (end == start)
+    return 0.0;
+  x = clamp((x - start) / (end - start), 0.0, 1.0);
+  if (x == 0.0)
+    return 0.0;
+  if (derivative)
+  {
+    if (x == 1.0)
+      return 0.0;
+    return 30.0 * Utility::pow<2>(x) * (x * (x - 2.0) + 1.0) / (end - start);
+  }
+  if (x == 1.0)
+    return 1.0;
+  return Utility::pow<3>(x) * (x * (x * 6.0 - 15.0) + 10.0);
+}
+
+} // namespace MathUtils

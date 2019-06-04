@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MONTECARLOSAMPLER_H
-#define MONTECARLOSAMPLER_H
+#pragma once
 
 #include "Sampler.h"
 
@@ -27,8 +26,9 @@ public:
 protected:
   virtual std::vector<DenseMatrix<Real>> sample() override;
 
-  /// Number of monte carlo samples to create for each distribution
-  const std::size_t _num_samples;
-};
+  /// Number of matrices
+  const dof_id_type _num_matrices;
 
-#endif /* MONTECARLOSAMPLER_H */
+  /// Number of monte carlo samples to create for each distribution
+  const dof_id_type _num_samples;
+};

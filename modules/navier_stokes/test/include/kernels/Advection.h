@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ADVECTION_H
-#define ADVECTION_H
+#pragma once
 
 #include "INSBase.h"
 
@@ -33,8 +32,6 @@ protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
   virtual Real computeQpOffDiagJacobian(unsigned /*jvar*/) { return 0; }
-  Function & _ffn;
+  const Function & _ffn;
   MooseEnum _tau_type;
 };
-
-#endif

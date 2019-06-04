@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef BOUNDINGBOXIC_H
-#define BOUNDINGBOXIC_H
+#pragma once
 
 #include "InitialCondition.h"
 
@@ -62,6 +61,7 @@ protected:
 
   /// The Point object constructed from the x2, y2, z2 components for the bottom left BB corner
   const Point _top_right;
-};
 
-#endif // BOUNDINGBOXIC_H
+  /// Interfacial width
+  const Real _int_width;
+};

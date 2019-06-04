@@ -1,16 +1,11 @@
-/****************************************************************/
-/*               DO NOT MODIFY THIS HEADER                      */
-/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
-/*                                                              */
-/*           (c) 2010 Battelle Energy Alliance, LLC             */
-/*                   ALL RIGHTS RESERVED                        */
-/*                                                              */
-/*          Prepared by Battelle Energy Alliance, LLC           */
-/*            Under Contract No. DE-AC07-05ID14517              */
-/*            With the U. S. Department of Energy               */
-/*                                                              */
-/*            See COPYRIGHT for full restrictions               */
-/****************************************************************/
+//* This file is part of the MOOSE framework
+//* https://www.mooseframework.org
+//*
+//* All rights reserved, see COPYRIGHT for full restrictions
+//* https://github.com/idaholab/moose/blob/master/COPYRIGHT
+//*
+//* Licensed under LGPL 2.1, please see LICENSE for details
+//* https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "NodalTranslationalInertia.h"
 #include "MooseVariable.h"
@@ -52,14 +47,19 @@ validParams<NodalTranslationalInertia>()
 
 NodalTranslationalInertia::NodalTranslationalInertia(const InputParameters & parameters)
   : TimeNodalKernel(parameters),
-    _mass(isParamValid("mass") ? getParam<Real>("mass") : 0.0),
-    _beta(isParamValid("beta") ? getParam<Real>("beta") : 0.1),
-    _gamma(isParamValid("gamma") ? getParam<Real>("gamma") : 0.1),
+    _has_mass(isParamValid("mass")),
+    _has_beta(isParamValid("beta")),
+    _has_gamma(isParamValid("gamma")),
+    _has_velocity(isParamValid("velocity")),
+    _has_acceleration(isParamValid("acceleration")),
+    _has_nodal_mass_file(isParamValid("nodal_mass_file")),
+    _mass(_has_mass ? getParam<Real>("mass") : 0.0),
+    _beta(_has_beta ? getParam<Real>("beta") : 0.1),
+    _gamma(_has_gamma ? getParam<Real>("gamma") : 0.1),
     _eta(getParam<Real>("eta")),
     _alpha(getParam<Real>("alpha"))
 {
-  if (isParamValid("beta") && isParamValid("gamma") && isParamValid("velocity") &&
-      isParamValid("acceleration"))
+  if (_has_beta && _has_gamma && _has_velocity && _has_acceleration)
   {
     _u_old = &(_var.dofValuesOld());
     _aux_sys = &(_fe_problem.getAuxiliarySystem());
@@ -69,8 +69,7 @@ NodalTranslationalInertia::NodalTranslationalInertia(const InputParameters & par
     MooseVariable * accel_variable = getVar("acceleration", 0);
     _accel_num = accel_variable->number();
   }
-  else if (!isParamValid("beta") && !isParamValid("gamma") && !isParamValid("velocity") &&
-           !isParamValid("acceleration"))
+  else if (!_has_beta && !_has_gamma && !_has_velocity && !_has_acceleration)
   {
     _vel = &(_var.dofValuesDot());
     _vel_old = &(_var.dofValuesDotOld());
@@ -82,14 +81,14 @@ NodalTranslationalInertia::NodalTranslationalInertia(const InputParameters & par
     mooseError("NodalTranslationalInertia: Either all or none of `beta`, `gamma`, `velocity` and "
                "`acceleration` should be provided as input.");
 
-  if (!isParamValid("nodal_mass_file") && !isParamValid("mass"))
+  if (!_has_nodal_mass_file && !_has_mass)
     mooseError(
         "NodalTranslationalInertia: Please provide either mass or nodal_mass_file as input.");
-  else if (isParamValid("nodal_mass_file") && isParamValid("mass"))
+  else if (_has_nodal_mass_file && _has_mass)
     mooseError("NodalTranslationalInertia: Please provide either mass or nodal_mass_file as input, "
                "not both.");
 
-  if (isParamValid("nodal_mass_file"))
+  if (_has_nodal_mass_file)
   {
     MooseUtils::DelimitedFileReader nodal_mass_file(getParam<FileName>("nodal_mass_file"));
     nodal_mass_file.setHeaderFlag(MooseUtils::DelimitedFileReader::HeaderFlag::OFF);
@@ -142,7 +141,7 @@ NodalTranslationalInertia::computeQpResidual()
   else
   {
     Real mass = 0.0;
-    if (isParamValid("mass"))
+    if (_has_mass)
       mass = _mass;
     else
     {
@@ -153,7 +152,7 @@ NodalTranslationalInertia::computeQpResidual()
                    "_node_id_to_mass map.");
     }
 
-    if (isParamValid("beta"))
+    if (_has_beta)
     {
       mooseAssert(_beta > 0.0, "NodalTranslationalInertia: Beta parameter should be positive.");
       const NumericVector<Number> & aux_sol_old = _aux_sys->solutionOld();
@@ -184,7 +183,7 @@ NodalTranslationalInertia::computeQpJacobian()
   else
   {
     Real mass = 0.0;
-    if (isParamValid("mass"))
+    if (_has_mass)
       mass = _mass;
     else
     {
@@ -195,7 +194,7 @@ NodalTranslationalInertia::computeQpJacobian()
                    "_node_id_to_mass map.");
     }
 
-    if (isParamValid("beta"))
+    if (_has_beta)
       return mass / (_beta * _dt * _dt) + _eta * (1 + _alpha) * mass * _gamma / _beta / _dt;
     else
       return mass * (*_du_dotdot_du)[_qp] + _eta * (1.0 + _alpha) * mass * (*_du_dot_du)[_qp];

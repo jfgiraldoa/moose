@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PIECEWISEBILINEAR_H
-#define PIECEWISEBILINEAR_H
+#pragma once
 
 #include "Function.h"
 
@@ -62,7 +61,7 @@ public:
   /**
    * This function will return a value based on the first input argument only.
    */
-  virtual Real value(Real t, const Point & pt) override;
+  virtual Real value(Real t, const Point & pt) const override;
 
 private:
   std::unique_ptr<BilinearInterpolation> _bilinear_interp;
@@ -78,5 +77,3 @@ private:
 
   void parse(std::vector<Real> & x, std::vector<Real> & y, ColumnMajorMatrix & z);
 };
-
-#endif // PIECEWISEBILINEAR_H

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef NONLINEAREIGENSYSTEM_H
-#define NONLINEAREIGENSYSTEM_H
+#pragma once
 
 #include "libmesh/libmesh_config.h"
 
@@ -75,12 +74,16 @@ public:
 
   virtual NonlinearSolver<Number> * nonlinearSolver() override;
 
-  virtual NumericVector<Number> & solutionOld() override
+  NumericVector<Number> & solutionOld() override { return *_transient_sys.old_local_solution; }
+
+  NumericVector<Number> & solutionOlder() override { return *_transient_sys.older_local_solution; }
+
+  const NumericVector<Number> & solutionOld() const override
   {
     return *_transient_sys.old_local_solution;
   }
 
-  virtual NumericVector<Number> & solutionOlder() override
+  const NumericVector<Number> & solutionOlder() const override
   {
     return *_transient_sys.older_local_solution;
   }
@@ -162,4 +165,3 @@ public:
 
 #endif
 
-#endif /* NONLINEAREIGENSYSTEM_H */

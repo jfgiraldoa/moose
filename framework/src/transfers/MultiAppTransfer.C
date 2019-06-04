@@ -47,7 +47,6 @@ validParams<MultiAppTransfer>()
   params.addParam<bool>("displaced_target_mesh",
                         false,
                         "Whether or not to use the displaced mesh for the target mesh.");
-
   return params;
 }
 
@@ -58,8 +57,14 @@ MultiAppTransfer::MultiAppTransfer(const InputParameters & parameters)
     _displaced_source_mesh(getParam<bool>("displaced_source_mesh")),
     _displaced_target_mesh(getParam<bool>("displaced_target_mesh"))
 {
-  bool check = getParam<bool>("check_multiapp_execute_on");
-  if (check && (getExecuteOnEnum() != _multi_app->getExecuteOnEnum()))
+  if (getParam<bool>("check_multiapp_execute_on"))
+    checkMultiAppExecuteOn();
+}
+
+void
+MultiAppTransfer::checkMultiAppExecuteOn()
+{
+  if (getExecuteOnEnum() != _multi_app->getExecuteOnEnum())
     mooseDoOnce(mooseWarning("MultiAppTransfer execute_on flags do not match associated Multiapp "
                              "execute_on flags"));
 }

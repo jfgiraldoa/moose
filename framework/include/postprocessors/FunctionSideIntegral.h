@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef FUNCTIONSIDEINTEGRAL_H
-#define FUNCTIONSIDEINTEGRAL_H
+#pragma once
 
 #include "SideIntegralPostprocessor.h"
 
@@ -33,7 +32,5 @@ protected:
   virtual Real computeQpIntegral() override;
 
   /// The function
-  Function & _func;
+  const Function & _func;
 };
-
-#endif // FUNCTIONSIDEINTEGRAL_H

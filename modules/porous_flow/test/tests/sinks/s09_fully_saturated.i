@@ -188,8 +188,19 @@
   solve_type = Newton
   dt = 1E-2
   end_time = 1
-  nl_rel_tol = 1E-9
-  nl_abs_tol = 1E-9
+  nl_rel_tol = 1E-11
+  nl_abs_tol = 1E-11
+[]
+
+[VectorPostprocessors]
+  [./mf]
+    type = LineValueSampler
+    start_point = '0 0 0'
+    end_point = '1 0 0'
+    num_points = 100
+    sort_by = x
+    variable = frac
+  [../]
 []
 
 [Outputs]
@@ -198,6 +209,10 @@
     type = Console
     execute_on = 'nonlinear linear'
   [../]
+  [./csv]
+    type = CSV
+    sync_times = '0.1 0.5 1'
+    sync_only = true
+  [../]
   interval = 10
-  exodus = true
 []

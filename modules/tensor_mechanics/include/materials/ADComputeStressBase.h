@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ADCOMPUTESTRESSBASE_H
-#define ADCOMPUTESTRESSBASE_H
+#pragma once
 
 #include "ADMaterial.h"
 #include "Function.h"
@@ -56,9 +55,7 @@ protected:
   ADMaterialProperty(RankTwoTensor) & _elastic_strain;
 
   /// initial stress components
-  std::vector<Function *> _initial_stress_fcn;
+  std::vector<const Function *> _initial_stress_fcn;
 
   usingMaterialMembers;
 };
-
-#endif // ADCOMPUTESTRESSBASE_H

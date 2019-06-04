@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MOOSEPARSEDFUNCTIONBASE_H
-#define MOOSEPARSEDFUNCTIONBASE_H
+#pragma once
 
 // Standard library
 #include <vector>
@@ -28,7 +27,7 @@ InputParameters validParams();
 
 /**
  * Creates the 'vars' and 'vals' parameters used by all ParsedFunctions, the
- * parameters provided from this function should be appeneded to the parameters
+ * parameters provided from this function should be appended to the parameters
  * for the class using the += operator.
  * @see MooseParsedFunction,  MooseParsedGradFunction, MooseParsedVectorFunction
  */
@@ -77,4 +76,3 @@ protected:
   std::unique_ptr<MooseParsedFunctionWrapper> _function_ptr;
 };
 
-#endif // MOOSEPARSEDFUNCTIONBASE_H

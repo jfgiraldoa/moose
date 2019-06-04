@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ELEMENTH1SEMIERROR_H
-#define ELEMENTH1SEMIERROR_H
+#pragma once
 
 #include "ElementIntegralVariablePostprocessor.h"
 
@@ -34,7 +33,5 @@ public:
 
 protected:
   virtual Real computeQpIntegral() override;
-  Function & _func;
+  const Function & _func;
 };
-
-#endif // ELEMENTH1SEMIERROR_H

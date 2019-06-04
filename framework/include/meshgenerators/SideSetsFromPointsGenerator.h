@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef SIDESETSFROMPOINTSGENERATOR_H
-#define SIDESETSFROMPOINTSGENERATOR_H
+#pragma once
 
 #include "SideSetsGeneratorBase.h"
 
@@ -26,7 +25,7 @@ class SideSetsFromPointsGenerator : public SideSetsGeneratorBase
 public:
   SideSetsFromPointsGenerator(const InputParameters & parameters);
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   std::unique_ptr<MeshBase> & _input;
@@ -36,4 +35,3 @@ protected:
   std::vector<Point> _points;
 };
 
-#endif // SIDESETSFROMPOINTSGENERATOR_H

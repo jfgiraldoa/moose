@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef DIRACKERNEL_H
-#define DIRACKERNEL_H
+#pragma once
 
 // MOOSE includes
 #include "DiracKernelInfo.h"
@@ -179,7 +178,7 @@ protected:
   Point _current_point;
 
   ///< Current element
-  const Elem *& _current_elem;
+  const Elem * const & _current_elem;
 
   /// Quadrature point index
   unsigned int _qp;
@@ -188,7 +187,7 @@ protected:
   /// Physical points
   const MooseArray<Point> & _physical_point;
   /// Quadrature rule
-  QBase *& _qrule;
+  const QBase * const & _qrule;
   /// Transformed Jacobian weights
   const MooseArray<Real> & _JxW;
 
@@ -241,4 +240,3 @@ private:
   const Elem * addPointWithValidId(Point p, unsigned id);
 };
 
-#endif

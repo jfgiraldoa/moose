@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef FUNCTIONIC_H
-#define FUNCTIONIC_H
+#pragma once
 
 #include "InitialCondition.h"
 
@@ -50,7 +49,5 @@ protected:
    */
   virtual RealGradient gradient(const Point & p) override;
 
-  Function & _func;
+  const Function & _func;
 };
-
-#endif // FUNCTIONIC_H

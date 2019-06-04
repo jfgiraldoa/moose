@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef COMPUTENODALAUXVARSTHREAD_H
-#define COMPUTENODALAUXVARSTHREAD_H
+#pragma once
 
 // MOOSE includes
 #include "ThreadedNodeLoop.h"
@@ -17,17 +16,18 @@
 
 // Forward declarations
 class AuxiliarySystem;
-class AuxKernel;
 class FEProblemBase;
 template <typename T>
 class MooseObjectWarehouse;
 
+template <typename AuxKernelType>
 class ComputeNodalAuxVarsThread
   : public ThreadedNodeLoop<ConstNodeRange, ConstNodeRange::const_iterator>
 {
 public:
   ComputeNodalAuxVarsThread(FEProblemBase & fe_problem,
-                            const MooseObjectWarehouse<AuxKernel> & storage);
+                            const MooseObjectWarehouse<AuxKernelType> & storage,
+                            const std::vector<std::vector<MooseVariableFEBase *>> & vars);
   // Splitting Constructor
   ComputeNodalAuxVarsThread(ComputeNodalAuxVarsThread & x, Threads::split split);
 
@@ -43,9 +43,10 @@ protected:
   AuxiliarySystem & _aux_sys;
 
   /// Storage object containing active AuxKernel objects
-  const MooseObjectWarehouse<AuxKernel> & _storage;
+  const MooseObjectWarehouse<AuxKernelType> & _storage;
+
+  const std::vector<std::vector<MooseVariableFEBase *>> _aux_vars;
 
   std::set<SubdomainID> _block_ids;
 };
 
-#endif // COMPUTENODALAUXVARSTHREAD_H

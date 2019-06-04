@@ -7,10 +7,9 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ADVECTORTIMEDERIVATIVE_H
-#define ADVECTORTIMEDERIVATIVE_H
+#pragma once
 
-#include "ADTimeKernel.h"
+#include "ADTimeKernelValue.h"
 
 // Forward Declaration
 template <ComputeStage>
@@ -19,7 +18,7 @@ class ADVectorTimeDerivative;
 declareADValidParams(ADVectorTimeDerivative);
 
 template <ComputeStage compute_stage>
-class ADVectorTimeDerivative : public ADVectorTimeKernel<compute_stage>
+class ADVectorTimeDerivative : public ADVectorTimeKernelValue<compute_stage>
 {
 public:
   ADVectorTimeDerivative(const InputParameters & parameters);
@@ -27,7 +26,6 @@ public:
 protected:
   virtual ADRealVectorValue precomputeQpResidual() override;
 
-  usingVectorTimeKernelMembers;
+  usingVectorTimeKernelValueMembers;
 };
 
-#endif // ADVECTORTIMEDERIVATIVE_H

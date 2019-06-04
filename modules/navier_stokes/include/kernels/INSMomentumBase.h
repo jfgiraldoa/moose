@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef INSMOMENTUMBASE_H
-#define INSMOMENTUMBASE_H
+#pragma once
 
 #include "INSBase.h"
 
@@ -44,7 +43,5 @@ protected:
   unsigned _component;
   bool _integrate_p_by_parts;
   bool _supg;
-  Function & _ffn;
+  const Function & _ffn;
 };
-
-#endif // INSMOMENTUMBASE_H

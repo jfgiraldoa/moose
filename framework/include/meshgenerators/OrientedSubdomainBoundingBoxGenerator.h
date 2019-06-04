@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ORIENTEDSUBDOMAINBOUNDINGBOXGENERATOR_H
-#define ORIENTEDSUBDOMAINBOUNDINGBOXGENERATOR_H
+#pragma once
 
 #include "MeshGenerator.h"
 #include "MooseEnum.h"
@@ -29,7 +28,7 @@ class OrientedSubdomainBoundingBoxGenerator : public MeshGenerator, public Orien
 public:
   OrientedSubdomainBoundingBoxGenerator(const InputParameters & parameters);
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   std::unique_ptr<MeshBase> & _input;
@@ -41,4 +40,3 @@ protected:
   const subdomain_id_type _block_id;
 };
 
-#endif // ORIENTEDSUBDOMAINBOUNDINGBOXGENERATOR_H

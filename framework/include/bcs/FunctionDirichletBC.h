@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef FUNCTIONDIRICHLETBC_H
-#define FUNCTIONDIRICHLETBC_H
+#pragma once
 
 #include "NodalBC.h"
 
@@ -37,7 +36,5 @@ protected:
   virtual Real computeQpResidual() override;
 
   /// The function being used for evaluation
-  Function & _func;
+  const Function & _func;
 };
-
-#endif // FUNCTIONDIRICHLETBC_H

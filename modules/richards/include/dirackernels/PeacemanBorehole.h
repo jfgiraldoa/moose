@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef PEACEMANBOREHOLE_H
-#define PEACEMANBOREHOLE_H
+#pragma once
 
 // Moose Includes
 #include "DiracKernel.h"
@@ -64,7 +63,7 @@ protected:
    * pressure, and does nothing otherwise
    * The flow rate to/from the borehole is multiplied by |character|, so usually character = +/- 1
    */
-  Function & _character;
+  const Function & _character;
 
   /// bottomhole pressure of borehole
   const Real _p_bot;
@@ -117,5 +116,3 @@ protected:
                     const Elem * ele,
                     const Real & rad);
 };
-
-#endif // PEACEMANBOREHOLE_H

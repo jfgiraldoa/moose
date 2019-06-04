@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef DUMPOBJECTSNONLINEARSYSTEM_H
-#define DUMPOBJECTSNONLINEARSYSTEM_H
+#pragma once
 
 #include "NonlinearSystemBase.h"
 #include "libmesh/nonlinear_solver.h"
@@ -32,8 +31,13 @@ public:
   virtual void stopSolve() override {}
   virtual bool converged() override { return true; }
   virtual NumericVector<Number> & RHS() override { return *_dummy; }
-  virtual NumericVector<Number> & solutionOld() override { return *_dummy; }
-  virtual NumericVector<Number> & solutionOlder() override { return *_dummy; }
+
+  NumericVector<Number> & solutionOld() override { return *_dummy; }
+  NumericVector<Number> & solutionOlder() override { return *_dummy; }
+
+  const NumericVector<Number> & solutionOld() const override { return *_dummy; }
+  const NumericVector<Number> & solutionOlder() const override { return *_dummy; }
+
   virtual unsigned int getCurrentNonlinearIterationNumber() override { return 0; }
   virtual void setupFiniteDifferencedPreconditioner() override {}
 
@@ -41,4 +45,3 @@ protected:
   NumericVector<Number> * _dummy;
 };
 
-#endif /* DUMPOBJECTSNONLINEARSYSTEM_H */

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef RICHARDSHALFGAUSSIANSINK
-#define RICHARDSHALFGAUSSIANSINK
+#pragma once
 
 #include "IntegratedBC.h"
 #include "RichardsVarNames.h"
@@ -49,7 +48,7 @@ protected:
   Real _centre;
 
   /// multiplying function: all fluxes will be multiplied by this
-  Function & _m_func;
+  const Function & _m_func;
 
   /**
    * holds info regarding the names of the Richards variables
@@ -72,5 +71,3 @@ protected:
   /// d(porepressure_i)/dvariable_j
   const MaterialProperty<std::vector<std::vector<Real>>> & _dpp_dv;
 };
-
-#endif // RICHARDSHALFGAUSSIANSINK

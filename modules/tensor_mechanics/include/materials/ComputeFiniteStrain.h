@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef COMPUTEFINITESTRAIN_H
-#define COMPUTEFINITESTRAIN_H
+#pragma once
 
 #include "ComputeIncrementalStrainBase.h"
 
@@ -25,7 +24,7 @@ class ComputeFiniteStrain : public ComputeIncrementalStrainBase
 public:
   ComputeFiniteStrain(const InputParameters & parameters);
 
-  virtual void computeProperties();
+  void computeProperties() override;
 
   static MooseEnum decompositionType();
 
@@ -45,4 +44,3 @@ private:
   const DecompMethod _decomposition_method;
 };
 
-#endif // COMPUTEFINITESTRAIN_H

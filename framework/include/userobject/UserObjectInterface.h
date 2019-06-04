@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef USEROBJECTINTERFACE_H
-#define USEROBJECTINTERFACE_H
+#pragma once
 
 // MOOSE includes
 #include "FEProblemBase.h"
@@ -17,6 +16,8 @@
 // Forward declarations
 class InputParameters;
 class UserObject;
+
+#define adGetUserObject this->template getUserObject
 
 /**
  * Interface for objects that need to use UserObjects.
@@ -92,4 +93,3 @@ UserObjectInterface::getUserObjectByName(const std::string & name)
   return _uoi_feproblem.getUserObject<T>(name, tid);
 }
 
-#endif // USEROBJECTINTERFACE_H

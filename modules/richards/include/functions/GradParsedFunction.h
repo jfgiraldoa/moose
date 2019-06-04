@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef GRADPARSEDFUNCTION_H
-#define GRADPARSEDFUNCTION_H
+#pragma once
 
 #include "MooseParsedFunction.h"
 
@@ -29,7 +28,7 @@ class GradParsedFunction : public MooseParsedFunction
 public:
   GradParsedFunction(const InputParameters & parameters);
 
-  virtual Real value(Real t, const Point & pt);
+  virtual Real value(Real t, const Point & pt) const;
 
 protected:
   /// central difference direction
@@ -38,4 +37,3 @@ protected:
   /// 2*|_direction|
   Real _len;
 };
-#endif // GRADPARSEDFUNCTION_H

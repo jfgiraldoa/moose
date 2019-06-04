@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef LSTABLEDIRK3_H
-#define LSTABLEDIRK3_H
+#pragma once
 
 #include "TimeIntegrator.h"
 
@@ -50,7 +49,8 @@ public:
 
   virtual int order() override { return 3; }
   virtual void computeTimeDerivatives() override;
-  virtual void computeADTimeDerivatives(DualReal & ad_u_dot, const dof_id_type & dof) override;
+  virtual void computeADTimeDerivatives(DualReal & ad_u_dot,
+                                        const dof_id_type & dof) const override;
   virtual void solve() override;
   virtual void postResidual(NumericVector<Number> & residual) override;
 
@@ -59,7 +59,7 @@ protected:
    * Helper function that actually does the math for computing the time derivative
    */
   template <typename T, typename T2>
-  void computeTimeDerivativeHelper(T & u_dot, const T2 & u_old);
+  void computeTimeDerivativeHelper(T & u_dot, const T2 & u_old) const;
 
   // Indicates the current stage.
   unsigned int _stage;
@@ -84,10 +84,9 @@ protected:
 
 template <typename T, typename T2>
 void
-LStableDirk3::computeTimeDerivativeHelper(T & u_dot, const T2 & u_old)
+LStableDirk3::computeTimeDerivativeHelper(T & u_dot, const T2 & u_old) const
 {
   u_dot -= u_old;
   u_dot *= 1. / _dt;
 }
 
-#endif /* LSTABLEDIRK3_H */

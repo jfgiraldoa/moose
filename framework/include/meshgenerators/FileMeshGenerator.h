@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef FILEMESHGENERATOR_H
-#define FILEMESHGENERATOR_H
+#pragma once
 
 #include "MeshGenerator.h"
 
@@ -26,10 +25,9 @@ class FileMeshGenerator : public MeshGenerator
 public:
   FileMeshGenerator(const InputParameters & parameters);
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   const MeshFileName & _file_name;
 };
 
-#endif // FILEMESHGENERATOR_H

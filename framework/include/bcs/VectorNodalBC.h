@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef VECTORNODALBC_H
-#define VECTORNODALBC_H
+#pragma once
 
 #include "NodalBCBase.h"
 #include "MooseVariableInterface.h"
@@ -40,7 +39,7 @@ protected:
   VectorMooseVariable & _var;
 
   /// current node being processed
-  const Node *& _current_node;
+  const Node * const & _current_node;
 
   /// Value of the unknown variable this BC is acting on
   const RealVectorValue & _u;
@@ -61,4 +60,3 @@ protected:
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 };
 
-#endif /* VECTORNODALBC_H */

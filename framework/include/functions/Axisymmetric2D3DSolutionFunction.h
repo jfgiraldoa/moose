@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef AXISYMMETRIC2D3DSOLUTIONFUNCTION_H
-#define AXISYMMETRIC2D3DSOLUTIONFUNCTION_H
+#pragma once
 
 #include "Function.h"
 
@@ -35,7 +34,7 @@ public:
    */
   Axisymmetric2D3DSolutionFunction(const InputParameters & parameters);
 
-  virtual Real value(Real t, const Point & p) override;
+  virtual Real value(Real t, const Point & p) const override;
 
   /**
    * Setup the function for use
@@ -84,5 +83,3 @@ protected:
   /// The local SolutionUserObject indices for the variables extracted from the file
   std::vector<unsigned int> _solution_object_var_indices;
 };
-
-#endif // AXISYMMETRIC2D3DSOLUTIONFUNCTION_H

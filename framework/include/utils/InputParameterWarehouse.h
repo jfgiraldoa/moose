@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef INPUTPARAMETERWAREHOUSE_H
-#define INPUTPARAMETERWAREHOUSE_H
+#pragma once
 
 #include <gtest/gtest.h>
 #include "MooseObjectName.h"
@@ -179,6 +178,7 @@ private:
   FRIEND_TEST(InputParameterWarehouse, getControllableItems);
   FRIEND_TEST(InputParameterWarehouse, getControllableParameter);
   FRIEND_TEST(InputParameterWarehouse, getControllableParameterValues);
+  FRIEND_TEST(InputParameterWarehouse, emptyControllableParameterValues);
   FRIEND_TEST(InputParameterWarehouse, addControllableParameterConnection);
   FRIEND_TEST(InputParameterWarehouse, addControllableParameterAlias);
 };
@@ -191,5 +191,3 @@ InputParameterWarehouse::getControllableParameterValues(
   ControllableParameter param = getControllableParameter(input);
   return param.get<T>();
 }
-
-#endif // INPUTPARAMETERWAREHOUSE_H

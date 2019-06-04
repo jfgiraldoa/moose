@@ -7,11 +7,11 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef FEATUREVOLUMEVECTORPOSTPROCESSOR_H
-#define FEATUREVOLUMEVECTORPOSTPROCESSOR_H
+#pragma once
 
 #include "GeneralVectorPostprocessor.h"
 #include "MooseVariableDependencyInterface.h"
+#include "BoundaryRestrictable.h"
 
 // Forward Declarations
 class FeatureVolumeVectorPostprocessor;
@@ -31,7 +31,8 @@ InputParameters validParams<FeatureVolumeVectorPostprocessor>();
  * one less thing for the user of this class to worry about.
  */
 class FeatureVolumeVectorPostprocessor : public GeneralVectorPostprocessor,
-                                         public MooseVariableDependencyInterface
+                                         public MooseVariableDependencyInterface,
+                                         public BoundaryRestrictable
 {
 public:
   FeatureVolumeVectorPostprocessor(const InputParameters & parameters);
@@ -58,14 +59,26 @@ protected:
   VectorPostprocessorValue & _intersects_bounds;
   VectorPostprocessorValue & _percolated;
 
+  /// Indicates whether the calculation should be run on volumes or area of a boundary
+  bool _is_boundary_restricted;
+
 private:
   /// Add volume contributions to one or entries in the feature volume vector
   void accumulateVolumes(const Elem * elem,
                          const std::vector<unsigned int> & var_to_features,
                          std::size_t num_features);
 
+  /// When boundary is supplied as input, compute coverage of that boundary by each feature
+  void accumulateBoundaryFaces(const Elem * elem,
+                               const std::vector<unsigned int> & var_to_features,
+                               std::size_t num_features,
+                               unsigned int side);
+
   /// Calculate the integral value of the passed in variable (index)
   Real computeIntegral(std::size_t var_index) const;
+
+  /// Calculate the integral on the face if boundary is supplied as input
+  Real computeFaceIntegral(std::size_t var_index) const;
 
   const std::vector<MooseVariableFEBase *> & _vars;
   std::vector<const VariableValue *> _coupled_sln;
@@ -73,9 +86,9 @@ private:
   MooseMesh & _mesh;
   Assembly & _assembly;
   const MooseArray<Point> & _q_point;
-  QBase *& _qrule;
+  const QBase * const & _qrule;
   const MooseArray<Real> & _JxW;
   const MooseArray<Real> & _coord;
+  const QBase * const & _qrule_face;
+  const MooseArray<Real> & _JxW_face;
 };
-
-#endif

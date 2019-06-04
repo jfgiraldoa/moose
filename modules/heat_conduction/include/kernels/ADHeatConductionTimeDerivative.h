@@ -6,8 +6,8 @@
 //*
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
-#ifndef ADHEATCONDUCTIONTIMEDERIVATIVE_H
-#define ADHEATCONDUCTIONTIMEDERIVATIVE_H
+
+#pragma once
 
 #include "ADTimeDerivative.h"
 
@@ -31,7 +31,6 @@ protected:
   /// Density material property
   const ADMaterialProperty(Real) & _density;
 
-  usingTimeKernelMembers;
+  usingTimeDerivativeMembers;
 };
 
-#endif // ADHEATCONDUCTIONTIMEDERIVATIVE_H

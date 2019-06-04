@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MULTIAPPTRANSFER_H
-#define MULTIAPPTRANSFER_H
+#pragma once
 
 // MOOSE includes
 #include "Transfer.h"
@@ -112,6 +111,12 @@ protected:
 
   // Given local app index, returns global app index.
   std::vector<unsigned int> _local2global_map;
-};
 
-#endif /* MULTIAPPTRANSFER_H */
+  /**
+   * Helper method for checking the 'check_multiapp_execute_on' flag.
+   *
+   * This method was added to allow the check to be delayed by child classes,
+   * see StochasticToolsTransfer for an example.
+   */
+  void checkMultiAppExecuteOn();
+};

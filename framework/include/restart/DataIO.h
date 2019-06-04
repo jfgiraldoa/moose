@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef DATAIO_H
-#define DATAIO_H
+#pragma once
 
 // MOOSE includes
 #include "DualReal.h"
@@ -381,11 +380,11 @@ dataStore(std::ostream & stream, DenseVector<T> & v, void * context)
   }
 }
 
-template <>
-void dataStore(std::ostream & stream, DenseMatrix<Real> & v, void * context);
-
 template <typename T>
 void dataStore(std::ostream & stream, TensorValue<T> & v, void * context);
+
+template <typename T>
+void dataStore(std::ostream & stream, DenseMatrix<T> & v, void * context);
 
 template <typename T>
 void dataStore(std::ostream & stream, VectorValue<T> & v, void * context);
@@ -628,11 +627,11 @@ dataLoad(std::istream & stream, DenseVector<T> & v, void * context)
   }
 }
 
-template <>
-void dataLoad(std::istream & stream, DenseMatrix<Real> & v, void * context);
-
 template <typename T>
 void dataLoad(std::istream & stream, TensorValue<T> & v, void * context);
+
+template <typename T>
+void dataLoad(std::istream & stream, DenseMatrix<T> & v, void * context);
 
 template <typename T>
 void dataLoad(std::istream & stream, VectorValue<T> & v, void * context);
@@ -893,4 +892,3 @@ public:
 
 } // namespace libMesh
 
-#endif /* DATAIO_H */

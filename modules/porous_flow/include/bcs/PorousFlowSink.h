@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef POROUSFLOWSINK_H
-#define POROUSFLOWSINK_H
+#pragma once
 
 #include "IntegratedBC.h"
 #include "Function.h"
@@ -91,7 +90,7 @@ protected:
   const bool _has_thermal_conductivity;
 
   /// The flux
-  Function & _m_func;
+  const Function & _m_func;
 
   /// Permeability of porous material
   const MaterialProperty<RealTensorValue> * const _permeability;
@@ -153,5 +152,3 @@ protected:
   /// d(multiplier)/d(Porous flow variable pvar)
   virtual Real dmultiplier_dvar(unsigned int pvar) const;
 };
-
-#endif // POROUSFLOWSINK_H

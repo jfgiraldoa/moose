@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef ELEMENTJACOBIANDAMPER_H
-#define ELEMENTJACOBIANDAMPER_H
+#pragma once
 
 // Moose Includes
 #include "GeneralDamper.h"
@@ -45,7 +44,7 @@ protected:
   Assembly & _assembly;
 
   /// Quadrature rule
-  QBase *& _qrule;
+  const QBase * const & _qrule;
 
   /// Transformed Jacobian weights
   const MooseArray<Real> & _JxW;
@@ -71,5 +70,3 @@ protected:
   /// Maximum allowed relative increment in Jacobian
   const Real _max_jacobian_diff;
 };
-
-#endif // ELEMENTJACOBIANDAMPER_H

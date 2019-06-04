@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef FUNCTIONSCALARAUX_H
-#define FUNCTIONSCALARAUX_H
+#pragma once
 
 #include "AuxScalarKernel.h"
 
@@ -29,7 +28,5 @@ public:
 protected:
   virtual Real computeValue() override;
 
-  std::vector<Function *> _functions;
+  std::vector<const Function *> _functions;
 };
-
-#endif /* FUNCTIONSCALARAUX_H */

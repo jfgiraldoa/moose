@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef INERTIALFORCE_H
-#define INERTIALFORCE_H
+#pragma once
 
 #include "TimeKernel.h"
 #include "Material.h"
@@ -34,8 +33,12 @@ private:
   const VariableValue * _u_old;
   const VariableValue * _vel_old;
   const VariableValue * _accel_old;
+  const bool _has_beta;
+  const bool _has_gamma;
   const Real _beta;
   const Real _gamma;
+  const bool _has_velocity;
+  const bool _has_acceleration;
   const MaterialProperty<Real> & _eta;
   const Real _alpha;
 
@@ -47,4 +50,3 @@ private:
   const VariableValue * _du_dotdot_du;
 };
 
-#endif // INERTIALFORCE_H

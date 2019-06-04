@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef DGFUNCTIONDIFFUSIONDIRICHLETBC_H
-#define DGFUNCTIONDIFFUSIONDIRICHLETBC_H
+#pragma once
 
 #include "IntegratedBC.h"
 
@@ -42,11 +41,9 @@ protected:
   virtual Real computeQpJacobian() override;
 
 private:
-  Function & _func;
+  const Function & _func;
 
   Real _epsilon;
   Real _sigma;
   const MaterialProperty<Real> & _diff;
 };
-
-#endif // DGFUNCTIONDIFFUSIONDIRICHLETBC_H

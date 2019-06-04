@@ -32,12 +32,21 @@
 [ICs]
   [./PolycrystalICs]
     [./PolycrystalVoronoiVoidIC]
+      polycrystal_ic_uo = voronoi
     [../]
   [../]
   [./c_IC]
     variable = c
     type = PolycrystalVoronoiVoidIC
     structure_type = voids
+    polycrystal_ic_uo = voronoi
+  [../]
+[]
+
+[UserObjects]
+  [./voronoi]
+    type = PolycrystalVoronoi
+    int_width = 0
   [../]
 []
 

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef FUNCTIONDIRACSOURCE_H
-#define FUNCTIONDIRACSOURCE_H
+#pragma once
 
 // Moose Includes
 #include "DiracKernel.h"
@@ -30,8 +29,6 @@ public:
 protected:
   virtual Real computeQpResidual() override;
 
-  Function & _function;
+  const Function & _function;
   Point _p;
 };
-
-#endif // FunctionDiracSource_H

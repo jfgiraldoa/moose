@@ -7,11 +7,10 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MULTIAPPUSEROBJECTTRANSFER_H
-#define MULTIAPPUSEROBJECTTRANSFER_H
+#pragma once
 
 // MOOSE includes
-#include "MultiAppTransfer.h"
+#include "MultiAppFieldTransfer.h"
 
 // Forward declarations
 class MultiAppUserObjectTransfer;
@@ -24,17 +23,14 @@ InputParameters validParams<MultiAppUserObjectTransfer>();
  * the MultiApp is.  Copies that value into a postprocessor in the
  * MultiApp.
  */
-class MultiAppUserObjectTransfer : public MultiAppTransfer
+class MultiAppUserObjectTransfer : public MultiAppFieldTransfer
 {
 public:
   MultiAppUserObjectTransfer(const InputParameters & parameters);
 
-  virtual void initialSetup() override;
-
   virtual void execute() override;
 
 protected:
-  AuxVariableName _to_var_name;
   std::string _user_object_name;
 
   /**
@@ -43,5 +39,3 @@ protected:
    **/
   const bool _all_master_nodes_contained_in_sub_app;
 };
-
-#endif // MULTIAPPVARIABLEVALUESAMPLEPOSTPROCESSORTRANSFER_H

@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef SCALARL2ERROR_H
-#define SCALARL2ERROR_H
+#pragma once
 
 // MOOSE includes
 #include "GeneralPostprocessor.h"
@@ -40,7 +39,5 @@ public:
 
 protected:
   MooseVariableScalar & _var;
-  Function & _func;
+  const Function & _func;
 };
-
-#endif // SCALARL2ERROR_H

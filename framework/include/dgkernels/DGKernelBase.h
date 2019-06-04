@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef DGKERNELBASE_H
-#define DGKERNELBASE_H
+#pragma once
 
 // local includes
 #include "MooseArray.h"
@@ -118,16 +117,16 @@ protected:
   MooseVariable & _var;
   MooseMesh & _mesh;
 
-  const Elem *& _current_elem;
+  const Elem * const & _current_elem;
 
   /// The volume (or length) of the current element
   const Real & _current_elem_volume;
 
   /// The neighboring element
-  const Elem *& _neighbor_elem;
+  const Elem * const & _neighbor_elem;
 
   /// Current side
-  unsigned int & _current_side;
+  const unsigned int & _current_side;
   /// Current side element
   const Elem *& _current_side_elem;
 
@@ -138,7 +137,7 @@ protected:
   const Moose::CoordinateSystemType & _coord_sys;
   unsigned int _qp;
   const MooseArray<Point> & _q_point;
-  QBase *& _qrule;
+  const QBase * const & _qrule;
   const MooseArray<Real> & _JxW;
   const MooseArray<Real> & _coord;
 
@@ -201,4 +200,3 @@ protected:
   static Threads::spin_mutex _jacoby_vars_mutex;
 };
 
-#endif // DGKERNELBASE_H

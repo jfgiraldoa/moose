@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef TILEDMESHGENERATOR_H
-#define TILEDMESHGENERATOR_H
+#pragma once
 
 #include "MeshGenerator.h"
 
@@ -26,7 +25,7 @@ class TiledMeshGenerator : public MeshGenerator
 public:
   TiledMeshGenerator(const InputParameters & parameters);
 
-  std::unique_ptr<MeshBase> generate();
+  std::unique_ptr<MeshBase> generate() override;
 
 protected:
   /// Mesh that possibly comes from another generator
@@ -38,4 +37,3 @@ protected:
   Real _z_width;
 };
 
-#endif // TILEDMESHGENERATOR_H

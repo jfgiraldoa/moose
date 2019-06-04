@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef MOOSE_H
-#define MOOSE_H
+#pragma once
 
 #include "libmesh/perf_log.h"
 #include "libmesh/libmesh_common.h"
@@ -17,6 +16,14 @@
 #include <set>
 #include <string>
 
+namespace libMesh
+{
+template <typename>
+class NumericVector;
+template <typename>
+class SparseMatrix;
+}
+
 using namespace libMesh;
 
 class ActionFactory;
@@ -24,6 +31,9 @@ class Factory;
 class MooseEnumItem;
 class ExecFlagEnum;
 class MooseVariableFEBase;
+
+void MooseVecView(NumericVector<Number> & vector);
+void MooseMatView(SparseMatrix<Number> & mat);
 
 /**
  * MOOSE now contains C++11 code, so give a reasonable error message
@@ -97,6 +107,7 @@ extern const ExecFlagType EXEC_SUBDOMAIN;
 extern const ExecFlagType EXEC_PRE_DISPLACE;
 extern const ExecFlagType EXEC_SAME_AS_MULTIAPP;
 extern const ExecFlagType EXEC_PRE_MULTIAPP_SETUP;
+extern const ExecFlagType EXEC_TRANSFER;
 
 namespace Moose
 {
@@ -210,4 +221,3 @@ private:
 
 } // namespace Moose
 
-#endif /* MOOSE_H */

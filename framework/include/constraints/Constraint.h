@@ -7,8 +7,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef CONSTRAINT_H
-#define CONSTRAINT_H
+#pragma once
 
 // MOOSE includes
 #include "MooseObject.h"
@@ -19,6 +18,7 @@
 #include "GeometricSearchInterface.h"
 #include "Restartable.h"
 #include "MeshChangedInterface.h"
+#include "TaggingInterface.h"
 
 // Forward Declarations
 class Assembly;
@@ -43,7 +43,8 @@ class Constraint : public MooseObject,
                    public TransientInterface,
                    protected GeometricSearchInterface,
                    public Restartable,
-                   public MeshChangedInterface
+                   public MeshChangedInterface,
+                   public TaggingInterface
 {
 public:
   Constraint(const InputParameters & parameters);
@@ -55,11 +56,6 @@ public:
    */
   SubProblem & subProblem() { return _subproblem; }
 
-  /**
-   * The variable number that this object operates on.
-   */
-  MooseVariable & variable() { return _var; }
-
   virtual bool addCouplingEntriesToJacobian() { return true; }
   virtual void subdomainSetup() override final
   {
@@ -69,17 +65,20 @@ public:
   virtual void residualEnd() {}
 
 protected:
-  SubProblem & _subproblem;
   SystemBase & _sys;
 
   THREAD_ID _tid;
 
   Assembly & _assembly;
-  MooseVariable & _var;
   MooseMesh & _mesh;
 
   unsigned int _i, _j;
   unsigned int _qp;
 };
 
-#endif
+#define usingConstraintMembers                                                                     \
+  usingMooseObjectMembers;                                                                         \
+  usingTaggingInterfaceMembers;                                                                    \
+  using Constraint::_i;                                                                            \
+  using Constraint::_qp;                                                                           \
+  using Constraint::_tid
