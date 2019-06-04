@@ -141,11 +141,8 @@ ComputeIndicatorThread::onBoundary(const Elem * elem,
   if (_finalize) // If finalizing we only do something on the elements
     return;
 
-  for (const auto & it : _aux_sys._elem_vars[_tid])
-  {
-    MooseVariable * var = it.second;
+  for (auto * var : _aux_sys._elem_vars[_tid])
     var->prepareAux();
-  }
 
   SubdomainID block_id = elem->subdomain_id();
   if (_external_side_indicators.hasActiveBlockObjects(block_id, _tid))

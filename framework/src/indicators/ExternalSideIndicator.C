@@ -60,7 +60,7 @@ ExternalSideIndicator::ExternalSideIndicator(const InputParameters & parameters)
     _u(_var.sln()),
     _grad_u(_var.gradSln()),
 
-    _normals(_field_var.normals())
+    _normals(_assembly.normals())
 {
   const std::vector<MooseVariableFEBase *> & coupled_vars = getCoupledMooseVars();
   for (const auto & var : coupled_vars)
